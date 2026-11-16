@@ -18,7 +18,7 @@ try {
         return {status:globalThis.qmrTest.membership};
       },
       sendMessage: async (params)=>{globalThis.qmrTest.messages.push(params);return {message_id:100}},
-      editMessageText: async (params)=>{globalThis.qmrTest.edits.push(params);return {message_id:params.message_id}},
+      editMessageText: async (params)=>{if(globalThis.qmrTest.editError)throw globalThis.qmrTest.editError;globalThis.qmrTest.edits.push(params);return {message_id:params.message_id}},
       answerCallbackQuery: async (params)=>{globalThis.qmrTest.answers.push(params);return true},
       setMyCommands:async ()=>true,setMyDescription:async()=>true,setMyShortDescription:async()=>true,
     };
@@ -84,6 +84,18 @@ try {
   assert.equal(source.from,'snapshot');
   assert.equal(selectLiveNodes({updated_at:'2020-01-01T00:00:00Z',endpoints:[]}),null);
   const defaultBtn=(await import(pathToFileURL(path.join(tmp,'tgcloud/lib/ui.js')).href)).home();
+  const {sendScreen}=await import(pathToFileURL(path.join(tmp,'tgcloud/lib/ui.js')).href);
+  reset();
+  globalThis.qmrTest.editError={description:'Bad Request: message is not modified'};
+  await sendScreen(10001,{text:'same screen'},321);
+  assert.equal(globalThis.qmrTest.messages.length,0,'Repeated taps must not send duplicates');
+  globalThis.qmrTest.editError={description:'Too Many Requests: retry after 5'};
+  await assert.rejects(()=>sendScreen(10001,{text:'rate limited'},321));
+  assert.equal(globalThis.qmrTest.messages.length,0,'Rate limits must not trigger a second send');
+  globalThis.qmrTest.editError={description:'Bad Request: message to edit not found'};
+  await sendScreen(10001,{text:'replacement'},321);
+  assert.equal(globalThis.qmrTest.messages.length,1,'Deleted screens may be replaced');
+  globalThis.qmrTest.editError=null;
   assert.equal(defaultBtn.inline_keyboard[2][0].style,undefined);
   const appRow=defaultBtn.inline_keyboard.find(row=>row.some(button=>button.web_app));
   assert.equal(appRow?.[0]?.web_app?.url,'https://qmr-proxy.alialnyamy675.chatgpt.site');
