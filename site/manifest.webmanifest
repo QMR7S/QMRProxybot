@@ -1,0 +1,14 @@
+{
+  "name": "QMR Proxy — اتصال تيليجرام",
+  "short_name": "QMR Proxy",
+  "lang": "ar",
+  "dir": "rtl",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#100f28",
+  "theme_color": "#100f28",
+  "icons": [
+    {"src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

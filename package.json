@@ -1,0 +1,13 @@
+{
+  "name": "qmrproxybot",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:syntax": "node --check tgcloud/handlers/message.js && node --check tgcloud/handlers/callback_query.js && node --check tgcloud/lib/nodes.js && node --check tgcloud/lib/ui.js && node --check tgcloud/lib/store.js && node --check tgcloud/schema.js && node --check site/app.js && node --check site/sw.js",
+    "test:bot": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "@tgcloud/cli": "^0.2.0"
+  }
+}

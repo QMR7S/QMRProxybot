@@ -1,0 +1,31 @@
+name: Validate QMR Proxy (no deployment)
+on:
+  push:
+    branches: [main, 'review/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python checks
+        run: python3 -m unittest discover -s tests -v
+      - name: MTProto installer shell check
+        run: bash -n proxy-node/install.sh
+      - name: JavaScript checks
+        run: |
+          node --check site/app.js
+          node --check site/sw.js
+          node --check tgcloud/handlers/message.js
+          node --check tgcloud/lib/nodes.js
+          node --check handoff/miniapp-v7/site/telegram-miniapp.js
+          node --check tgcloud/lib/ui.js
+          node --check tgcloud/lib/store.js
+          node --check tgcloud/handlers/callback_query.js
+          node --check tgcloud/schema.js
+      - name: QMR Proxy v6 simulated flows
+        run: node tests/smoke.mjs
+      - name: TGCloud root repair syntax
+        run: bash -n scripts/repair-tgcloud-root.sh
