@@ -1,0 +1,12 @@
+{
+  "name": "qmrproxybot",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:syntax": "node --check tgcloud/handlers/message.js && node --check tgcloud/lib/nodes.js && node --check site/app.js && node --check site/sw.js"
+  },
+  "devDependencies": {
+    "@tgcloud/cli": "^0.2.0"
+  }
+}

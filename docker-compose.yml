@@ -1,0 +1,11 @@
+services:
+  mtg:
+    image: nineseconds/mtg:2
+    restart: unless-stopped
+    command: ["run", "/config.toml"]
+    volumes:
+      - ./runtime/config.toml:/config.toml:ro
+    ports:
+      - "443:3128/tcp"
+    security_opt:
+      - no-new-privileges:true

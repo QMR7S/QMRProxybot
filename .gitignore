@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+.tgcloud/
+node_modules/
+runtime/
+__pycache__/
+*.pyc
+*.log
+.DS_Store

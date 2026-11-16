@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100f28"><meta name="description" content="QMR Proxy — إعداد اتصالات تيليجرام MTProto">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./styles.css"><script defer src="./app.js"></script>
+<title>QMR Proxy | Telegram MTProto</title>
+</head>
+<body>
+<main class="shell">
+<header><div class="brand"><img src="./icons/icon.svg" alt="" width="48" height="48"><span><strong>QMR Proxy</strong><small>QMR7S · Telegram connectivity</small></span></div><span class="chip">MTProto</span></header>
+<section class="hero"><p class="eyebrow">TELEGRAM CONNECTION</p><h1>اتصال تيليجرام، <em>بطريقة أبسط.</em></h1>
+<p>اختر بروكسي موثوقاً ثم افتح إعداد الاتصال مباشرة داخل تيليجرام. إذا تعطل خادم، جرّب آخر من القائمة.</p>
+<a class="btn primary" href="#servers">استعراض السيرفرات</a>
+<button class="btn alt" id="install" hidden>تثبيت كتطبيق</button>
+</section>
+<section class="panel" id="servers"><div class="heading"><h2>الخوادم</h2><button id="refresh" class="btn alt">تحديث القائمة</button></div>
+<p id="updated" aria-live="polite">جاري التحميل...</p><div id="list" aria-live="polite"></div></section>
+<section class="panel"><h2>طريقة الاستخدام</h2><p>1. اختر السيرفر واضغط «فتح في تيليجرام». 2. وافق على إضافة البروكسي. 3. أضف سيرفرات احتياطية وفعّل التبديل التلقائي من إعدادات تيليجرام.</p><p class="muted">إذا لم يعمل فتح الرابط، استخدم بيانات الاتصال اليدوية من البطاقة.</p></section>
+<footer>الموقع لا يطلب رقم هاتفك أو رمز تسجيل الدخول. هذه روابط اتصال عامة، وليست ضماناً بأن الخادم يعمل على كل شبكة. بروكسي MTProto ليس VPN.</footer>
+</main><div id="toast" role="status" aria-live="polite"></div>
+</body></html>

@@ -1,0 +1,20 @@
+name: Validate QMR Proxy (no deployment)
+on:
+  push:
+    branches: [main, 'review/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python checks
+        run: python3 -m unittest discover -s tests -v
+      - name: JavaScript checks
+        run: |
+          node --check site/app.js
+          node --check site/sw.js
+          node --check tgcloud/handlers/message.js
+          node --check tgcloud/lib/nodes.js
