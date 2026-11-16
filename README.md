@@ -1,18 +1,23 @@
-# QMR Proxy v2 — safe integration for @QMRProxybot
+# QMR Proxy — staged integration and real MTProto node kit
 
-This repository contains a **staged** Telegram MTProto proxy directory: a standalone Arabic website, optional Telegram Serverless bot handlers, and VPS setup templates.
+**Current status, 16 Nov 2026**
+- **Telegram bot:** @QMRProxybot already works on Telegram Serverless. Its user-verified Bot ID is `9239734904`; an existing Serverless handler and webhook are operational. **Nothing in this GitHub integration has redeployed or modified them.**
+- **Public PWA:** https://qmr-proxy.alialnyamy675.chatgpt.site — a separate ChatGPT Sites deployment based on the v3 site handoff. It lets users save/import/share MTProto links. **It is not a TCP proxy itself.**
+- **Public MTProto nodes:** none have been provisioned or verified yet. The published `nodes.json` inventory is empty.
+- **GitHub:** only a review/draft PR is staged; this does not automatically deploy anything.
 
-**Deployment status: NOT DEPLOYED.** This commit does not change @QMRProxybot, Telegram webhooks, Serverless state, hosting, existing customers, or secrets. Site inventory starts empty; there is no operational proxy yet.
+## Important layout
 
-## Components
-- `site/`: static HTTPS web PWA to distribute Telegram proxy connection links *outside Telegram*.
-- `tgcloud/`: JavaScript message handler for Telegram Serverless. The bot **only distributes links**; it does **not** transport MTProto TCP traffic.
-- `scripts/`: inventory sync, initial VPS MTProto setup, and validation helpers.
-- `docker-compose.yml`: optional dedicated mtg v2 TCP proxy **on an independently hosted VPS**.
-- `.github/workflows/ci.yml`: non-deploying tests.
-- `.github/workflows/pages.yml`: **manual** Pages deployment only.
+- **`proxy-node/`** — **recommended new MTProto deployment kit** using upstream `nineseconds/mtg:2`. A Docker Compose service, guarded first-time setup, a test-only link preview, and export of public node data after a successful Telegram client test.
+- `docs/MTProto_GITHUB_INTEGRATION.md` — source comparisons and deployment boundaries.
+- `site/` — earlier standalone website code kept for history. **Do not overwrite the current live ChatGPT Sites v3 design with this older snapshot.**
+- `tgcloud/` — optional Serverless source for link distribution. **Do not push over the deployed bot without an authenticated diff and safe migration plan.**
+- `scripts/sync_nodes.py` — compiles public node data for the bot when a verified server exists.
+- `docker-compose.yml` and `scripts/setup.sh` (repository root) — **older v2 prototype**, not recommended. Use the newer isolated `proxy-node/` deployment kit instead.
+- `.github/workflows/ci.yml` — tests only; `.github/workflows/pages.yml` — manual Pages workflow, NOT the active ChatGPT Sites hosting.
 
-## First checks (safe)
+## Non-destructive review checks
+
 ```bash
 python3 -m unittest discover -s tests -v
 node --check site/app.js
@@ -21,13 +26,15 @@ node --check tgcloud/lib/nodes.js
 node --check site/sw.js
 ```
 
-## Production sequence (not automatically triggered)
-1. Inspect the live @QMRProxybot webhook, TGCloud CLI project, and existing Serverless state without replacing or disabling anything.
-2. Decide whether it is safe to adopt the current bot or use a separate bot. No polling bot may operate concurrently on an existing Webhook/Serverless bot.
-3. Provision a public, always-on **TCP** MTProto node with Docker on an independent VPS; check real traffic from Iraq.
-4. Insert verified node connection details into `site/nodes.json`. These MTProto client secrets are intentionally public; never publish bot tokens or hosting keys.
-5. Synchronize the handler's node data with `python3 scripts/sync_nodes.py --web-url HTTPS_SITE_URL`.
-6. Publish and test the standalone site (check whether private-repository Pages is available on the GitHub plan). This needs a separate publicly accessible HTTPS endpoint.
-7. Only after inspecting `npx tgcloud status` and `npx tgcloud diff`, upload the handler from the owner's authenticated environment, provided no existing handlers would be overwritten.
+## Actual MTProto hosting
 
-Read [safe deployment checklist](docs/DEPLOYMENT_CHECKLIST.md) before any publication. The repository remains private. Never change repository visibility automatically.
+1. Obtain a dedicated Linux VPS with public routable IPv4, an available TCP/443 port, and allowed egress to Telegram. **GitHub, Telegram Serverless, ChatGPT Sites and normal HTTP serverless platforms cannot do this job.**
+2. Read [proxy-node/README.md](proxy-node/README.md) and only then run `bash proxy-node/install.sh PUBLIC_IP OWN_REAL_DOMAIN` **on that VPS**, not in Termux or the site.
+3. Generate a test link with `python3 proxy-node/export-node.py --server PUBLIC_IP --preview`.
+4. Test the actual Telegram connection from at least one network in Iraq. Container running, ping, or HTTP status is not enough.
+5. Export the confirmed public node with `--confirm-client-test` and update **the existing live Sites v3 `nodes.json`** without replacing the website source. Update the bot's inventory in a separate reviewed TGCloud release, keeping its webhook untouched.
+6. Keep nodes and host secrets distinct: MTProto client secret becomes public by design; bot API tokens, TGCloud CLI credentials and SSH keys must never be committed or shared.
+
+This project does not provide fake/free upstream MTProto servers and cannot promise censorship bypass or faster connections without real target-network tests.
+
+Refer to [docs/DEPLOYMENT_CHECKLIST.md](docs/DEPLOYMENT_CHECKLIST.md) for additional precautions.
