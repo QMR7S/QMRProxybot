@@ -4,7 +4,7 @@ import { nodes, PUBLIC_SITE_URL } from '../lib/nodes.js';
 
 function good(n){return n && n.enabled!==false && typeof n.server==='string' && /^[a-zA-Z0-9.-]{1,253}$/.test(n.server) &&
  Number.isInteger(n.port) && n.port>=1 && n.port<=65535 && typeof n.secret==='string' && /^[A-Za-z0-9_-]{16,}$/.test(n.secret);}
-function proxy(n){return 'https://t.me/proxy?'+new URLSearchParams({server:n.server,port:String(n.port),secret:n.secret}).toString();}
+function proxy(n){return 'https://t.me/proxy?server='+encodeURIComponent(n.server)+'&port='+n.port+'&secret='+encodeURIComponent(n.secret);}
 export default async function(message){
  if(!message?.chat?.id || typeof message.text!=='string')return;
  const cmd=message.text.trim().split(/\s+/)[0].split('@')[0].toLowerCase();
