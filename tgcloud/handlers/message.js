@@ -1,39 +1,46 @@
-// Telegram Serverless message handler — staged review only.
-// Existing live bot/webhook must be inspected before targeted deployment.
-import { api } from 'sdk';
-import { nodes, PUBLIC_SITE_URL } from '../lib/nodes.js';
+// Staged Telegram Serverless handler; deploy targeted modules only after a live diff.
+import { api, fetch as sdkFetch } from 'sdk';
+import { currentNodes } from '../lib/source.js';
 
-function good(n) {
-  return n && n.enabled !== false
-    && typeof n.server === 'string' && /^[a-zA-Z0-9.-]{1,253}$/.test(n.server)
-    && Number.isInteger(n.port) && n.port >= 1 && n.port <= 65535
-    && typeof n.secret === 'string' && /^[A-Za-z0-9_-]{16,}$/.test(n.secret);
-}
+const WEBSITE = 'https://qmr-proxy.alialnyamy675.chatgpt.site';
+const CHANNEL = 'https://t.me/QMR7S';
 function link(n) {
   return 'https://t.me/proxy?server=' + encodeURIComponent(n.server)
     + '&port=' + n.port + '&secret=' + encodeURIComponent(n.secret);
 }
 export default async function(message) {
   if (!message?.chat?.id || typeof message.text !== 'string') return;
-  const cmd = message.text.trim().split(/\s+/)[0].split('@')[0].toLowerCase();
-  if (!['/start','/help','/proxy','/servers'].includes(cmd)) return;
-  if (cmd === '/start' || cmd === '/help') {
-    await api.sendMessage({chat_id: message.chat.id,
-      text: 'QMR Proxy — إدارة روابط MTProto لتيليجرام\n/proxy — روابط بروكسيات عامة\n/servers — الخوادم المدرجة\n/help — المساعدة\n\nتنبيه: الروابط المدرجة تعود لمشغّلين خارجيين، ليست خوادم QMR7S. لم نختبرها من العراق؛ مشغّلها قد يرى IP وأوقات اتصالك. الموقع المستقل: ' + PUBLIC_SITE_URL});
+  const parts = message.text.trim().split(/\s+/);
+  const command = parts[0].split('@')[0].toLowerCase();
+  if (!['/start','/help','/proxy','/servers','/channel'].includes(command)) return;
+  const chatId = message.chat.id;
+  if (command === '/start' || command === '/help') {
+    await api.sendMessage({chat_id:chatId,
+      text:'QMR Proxy — روابط MTProto\n/servers — أفضل 10 بروكسيات\n/servers 2 — الصفحة 2 حتى 6\n/proxy — روابط الاتصال\n/channel — قناة QMR7S\n/help — المساعدة\n\nالموقع مستقل عند تعذر فتح تيليجرام. الروابط من مشغلين خارجيين؛ لا نضمن الخصوصية أو خلوها من قناة ترويجية.',
+      reply_markup:{inline_keyboard:[[{text:'موقع QMR Proxy',url:WEBSITE},{text:'قناة QMR7S',url:CHANNEL}]]}});
     return;
   }
-  const available = (Array.isArray(nodes) ? nodes : []).filter(good).slice(0, 10);
-  if (!available.length) {
-    await api.sendMessage({chat_id: message.chat.id,
-      text:'لا توجد بروكسيات عامة مدرجة حالياً. راجع الموقع المستقل أو أضف بروكسي موثوقاً يدوياً.'});
+  if (command === '/channel') {
+    await api.sendMessage({chat_id:chatId,
+      text:'تابع @QMR7S. تنبيه: لا يمكننا تغيير القناة الترويجية التي يحددها مشغّل بروكسي خارجي.',
+      reply_markup:{inline_keyboard:[[{text:'قناة QMR7S',url:CHANNEL}]]}});
     return;
   }
-  const keyboard = available.map(n => [{text: String(n.name || 'بروكسي خارجي').slice(0,35), url: link(n)}]);
-  if (/^https:\/\//.test(PUBLIC_SITE_URL)) {
-    keyboard.push([{text:'الموقع المستقل',url:PUBLIC_SITE_URL}]);
+  const result = await currentNodes(sdkFetch);
+  const nodes = Array.isArray(result.nodes) ? result.nodes : [];
+  if (!nodes.length) {
+    await api.sendMessage({chat_id:chatId,text:'لا توجد روابط عامة حالياً. يمكنك إضافة بروكسي خاص بك من الموقع.'});
+    return;
   }
-  await api.sendMessage({chat_id: message.chat.id,
-    text:'هذه روابط بروكسيات MTProto مجتمعية من مشغّلين خارجيين، ليست خوادم QMR7S. لم نختبرها من العراق ولا نضمن سرعتها أو توفرها أو خصوصيتها. انتبه: المشغّل قد يعرف IP ووقت الاتصال، وقد تظهر قنوات ترويجية. اختر بروكسي تثق به.',
-    reply_markup:{inline_keyboard: keyboard},
-    link_preview_options:{is_disabled:true}});
+  const pages = Math.ceil(nodes.length/10);
+  const requested = Number(parts[1] || 1);
+  const page = Number.isInteger(requested) && requested>=1 && requested<=pages ? requested : 1;
+  const slice = nodes.slice((page-1)*10,page*10);
+  const keyboard=slice.map((n,i) => [{text:'🔗 '+String((page-1)*10+i+1).padStart(2,'0')+' · '+n.server.slice(0,26),url:link(n)}]);
+  keyboard.push([{text:'قناة QMR7S',url:CHANNEL},{text:'الموقع الكامل',url:WEBSITE}]);
+  await api.sendMessage({chat_id:chatId,
+    text:'بروكسيات MTProto المجتمعية — '+page+'/'+pages+'\n'+
+    (result.origin==='remote'?'بيانات مصدر حديثة':'نسخة احتياطية من المصدر')+
+    ' · '+nodes.length+' عنواناً.\n⚠️ ليست خوادم QMR7S ولم تُختبر من العراق، وحالة الإعلان الترويجي غير مؤكدة. مشغّلها قد يعرف IP وأوقات اتصالك.\nللتصفح اكتب /servers 2 ... /servers '+pages,
+    reply_markup:{inline_keyboard:keyboard},link_preview_options:{is_disabled:true}});
 }
