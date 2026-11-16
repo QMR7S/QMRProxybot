@@ -1,0 +1,22 @@
+# Actual MTProto TCP server. Requires a dedicated Linux VPS with a public IP.
+# This file is NOT compatible with ChatGPT Sites, Telegram Serverless, or Vercel Functions.
+services:
+  mtg:
+    image: nineseconds/mtg:2
+    restart: unless-stopped
+    init: true
+    command: ["run", "/config.toml"]
+    ports:
+      - "0.0.0.0:443:3128/tcp"
+    volumes:
+      - ./runtime/config.toml:/config.toml:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
