@@ -125,7 +125,13 @@ export async function sendScreen(chatId,screen,editMessageId=null) {
   const params={chat_id:chatId,...screen,link_preview_options:{is_disabled:true}};
   if (editMessageId) {
     try { return await api.editMessageText({...params,message_id:editMessageId}); }
-    catch (_) { /* Older/deleted message or no text change; send replacement */ }
+    catch (error) {
+      // A repeated callback can produce this successful no-op. Sending a new
+      // message here would duplicate the existing screen on every repeated tap.
+      const description=String(error?.description || error?.message || '');
+      if (/message is not modified/i.test(description)) return;
+      if (!/message to edit not found|message can't be edited/i.test(description)) throw error;
+    }
   }
   return api.sendMessage(params);
 }
