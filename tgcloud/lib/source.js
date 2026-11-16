@@ -1,6 +1,6 @@
 // Outbound HTTP is available ONLY through the Telegram Serverless SDK 'fetch'.
 // Public MTProto community list with static fallback; no bot token or webhook operations.
-import { nodes as fallback } from './nodes.js';
+import { nodes as fallback } from 'lib/nodes';
 const UPSTREAM = 'https://iwizard7.github.io/MTProxy_list/endpoints.json';
 const MAX_AGE_MS = 36 * 60 * 60 * 1000;
 let memory = null;
