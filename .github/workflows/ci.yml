@@ -20,6 +20,7 @@ jobs:
           node --check site/sw.js
           node --check tgcloud/handlers/message.js
           node --check tgcloud/lib/nodes.js
+          node --check handoff/miniapp-v7/site/telegram-miniapp.js
           node --check tgcloud/lib/ui.js
           node --check tgcloud/lib/store.js
           node --check tgcloud/handlers/callback_query.js

@@ -74,7 +74,7 @@ try {
   globalThis.qmrTest.memberError=false;
   reset();
   await m(fakeUser(6246913670,'/setup'));
-  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/إعدادات ملف البوت/);
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/إعداد الملف الشخصي للبوت/);
   reset();
   await m(fakeUser(10001,'/maintenance on'));
   assert.equal(globalThis.qmrTest.messages.at(-1)?.text?.includes('مفعل'),false);
@@ -85,5 +85,19 @@ try {
   assert.equal(selectLiveNodes({updated_at:'2020-01-01T00:00:00Z',endpoints:[]}),null);
   const defaultBtn=(await import(pathToFileURL(path.join(tmp,'tgcloud/lib/ui.js')).href)).home();
   assert.equal(defaultBtn.inline_keyboard[2][0].style,undefined);
-  console.log('PASS: 13 v6 integration assertions — subscription, callback permissions, 60 fallback links, owner gating, profile setup, safe storage errors');
+  const appRow=defaultBtn.inline_keyboard.find(row=>row.some(button=>button.web_app));
+  assert.equal(appRow?.[0]?.web_app?.url,'https://qmr-proxy.alialnyamy675.chatgpt.site');
+  reset();
+  await m(fakeUser(10001,'/app'));
+  assert.ok(globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.some(row=>row.some(x=>x.web_app?.url)));
+  reset();
+  await m(fakeUser(10001,'/faq'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/الأسئلة الشائعة/);
+  reset();
+  await cb(fakeCb(10001,'q:safety'));
+  assert.match(globalThis.qmrTest.edits.at(-1)?.text||'',/دليل الأمان/);
+  reset();
+  await m(fakeUser(6246913670,'/setup'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/configure_profile.py/);
+  console.log('PASS: v7 integration assertions — Mini App, safety, FAQ, subscription, callback permissions, fallback links, owner-only admin, safe profile setup');
 } finally {fs.rmSync(tmp,{recursive:true,force:true});}

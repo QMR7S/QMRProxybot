@@ -43,7 +43,7 @@ export default async function(query) {
     await ack(query,membership.ok?'تم التحقق من الاشتراك':'لم يكتمل التحقق');
     return sendScreen(chatId,membership.ok?{text:text.welcome,reply_markup:home(owner)}:subscriptionScreen(membership),messageId);
   }
-  if (!owner && !['q:help','q:terms','q:privacy','q:steps','q:about','q:support','q:channel'].includes(data)) {
+  if (!owner && !['q:help','q:terms','q:privacy','q:steps','q:about','q:support','q:channel','q:faq','q:safety','q:app'].includes(data)) {
     const membership=await checkSubscription(uid);
     if (!membership.ok) {await ack(query);return sendScreen(chatId,subscriptionScreen(membership),messageId);}
   }
@@ -58,7 +58,7 @@ export default async function(query) {
     return sendScreen(chatId,await serversScreen(page),messageId);
   }
   if (data==='q:status') return sendScreen(chatId,await statusScreen(),messageId);
-  for (const section of ['help','steps','terms','privacy','about','channel','support']) {
+  for (const section of ['help','steps','faq','safety','terms','privacy','about','channel','support','app']) {
     if (data==='q:'+section) return sendScreen(chatId,genericScreen(section,owner),messageId);
   }
   if (!owner) return sendScreen(chatId,genericScreen('help',owner),messageId);

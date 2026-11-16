@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "QMR Proxy — اتصال تيليجرام",
+  "short_name": "QMR Proxy",
+  "description": "روابط MTProto الخاصة بك في تطبيق ويب عربي قابل للتثبيت",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090714",
+  "theme_color": "#100b25",
+  "icons": [
+    {"src": "./assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}

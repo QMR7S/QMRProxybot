@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#100b25">
+  <meta name="description" content="QMR Proxy من QMR7S: احفظ روابط بروكسي MTProto وافتح إعدادها في تيليجرام بسهولة، من موقع قابل للتثبيت كتطبيق.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="QMR Proxy — تيليجرام أقرب">
+  <meta property="og:description" content="QMR Proxy من QMR7S: 60 رابط MTProto مجتمعي، بحث وحفظ محلي، وواجهة Mini App داخل تيليجرام.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://qmr-proxy.alialnyamy675.chatgpt.site/">
+  <meta property="og:image" content="https://qmr-proxy.alialnyamy675.chatgpt.site/assets/qmr-social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://qmr-proxy.alialnyamy675.chatgpt.site/assets/qmr-social-preview.png">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  <script src="./telegram-miniapp.js" defer></script>
+  <script src="./app.js" defer></script>
+  <title>QMR Proxy · تيليجرام أقرب</title>
+</head>
+<body>
+  <div class="ambient ambient--one" aria-hidden="true"></div><div class="ambient ambient--two" aria-hidden="true"></div>
+  <a class="skip" href="#main">الانتقال إلى المحتوى</a>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="QMR Proxy الرئيسية">
+        <span class="brand-logo"><img src="./assets/icon.svg" width="40" height="40" alt=""></span>
+        <span class="brand-text"><strong>QMR<span>Proxy</span></strong><small>by QMR7S</small></span>
+      </a>
+      <nav class="desktop-nav" aria-label="أقسام الموقع"><a href="#servers">السيرفرات</a><a href="#add">أضف بروكسي</a><a href="#how">كيف يعمل؟</a></nav>
+      <button id="install-top" class="button button--outline button--small" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#download"/></svg><span>تثبيت التطبيق</span></button>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-heading">
+        <div class="hero-content">
+          <span class="eyebrow"><span class="eyebrow-dot"></span> QMR7S <span class="sep">/</span> TELEGRAM CONNECTIVITY</span>
+          <h1 id="hero-heading">تيليجرام أقرب.<br><span class="gradient-text">الاتصال أبسط.</span></h1>
+          <p class="hero-desc">روابط بروكسي MTProto الخاصة بك في مكان واحد. اختر السيرفر، افتح الرابط داخل تيليجرام، واحتفظ ببدائلك على الشاشة الرئيسية.</p>
+          <div class="hero-actions"><a class="button button--primary" href="#servers"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#arrow-left"/></svg> استعراض السيرفرات</a><a class="button button--subtle" href="#add"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#plus"/></svg> إضافة بروكسي</a></div>
+          <div class="trust-row"><span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#shield"/></svg> بدون تسجيل دخول</span><span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#lock"/></svg> حفظ محلي على جهازك</span></div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-ring ring-a"></div><div class="art-ring ring-b"></div>
+          <div class="art-spark spark-a">✦</div><div class="art-spark spark-b">✧</div>
+          <div class="mock glass-panel">
+            <div class="mock-head"><span class="mock-avatar"><img src="./assets/icon.svg" width="31" height="31" alt=""></span><span><strong>QMR Proxy</strong><small>Smart connection manager</small></span><i class="mock-dots">•••</i></div>
+            <div class="mock-main"><div class="mock-step"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#smartphone"/></svg><span>جهازك</span></div><span class="mock-line"></span><div class="mock-step mock-step--center"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#server"/></svg><span>MTProto</span></div><span class="mock-line"></span><div class="mock-step"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#send"/></svg><span>Telegram</span></div></div>
+            <div class="mock-alert"><span class="mock-alert-dot"></span> خيارات مجتمعية — ليست خوادم QMR7S</div>
+            <div class="mock-footer"><span>QMR7S NETWORK</span><span>SECURE SETUP ↗</span></div>
+          </div>
+          <div class="floating-label label-a">MTProto</div><div class="floating-label label-b">QMR7S ✦</div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="معلومات الخدمة"><div class="metric"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#globe"/></svg></span><span><strong id="public-count">0</strong><small>سيرفر عام مدرج</small></span></div><div class="metric"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#bookmark"/></svg></span><span><strong id="saved-count">0</strong><small>بروكسي محفوظ</small></span></div><div class="metric"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#zap"/></svg></span><span><strong>MTProto</strong><small>بروتوكول تيليجرام</small></span></div></section>
+
+      <section class="section" id="servers" aria-labelledby="servers-heading">
+        <div class="section-heading"><div><div class="overline">SERVERS <span>·</span> YOUR CONNECTIONS</div><h2 id="servers-heading">كل السيرفرات. مكان واحد.</h2><p>احتفظ بالسيرفرات الموثوقة، واختر ما يناسب شبكتك. ليست هذه الصفحة اختبار سرعة أو ضمان اتصال.</p></div><button class="button button--outline button--small" id="refresh" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#refresh"/></svg> تحديث</button></div>
+        <div class="service-notice" id="public-notice" role="status"><svg class="icon notice-icon" aria-hidden="true"><use href="./assets/icons.svg#info"/></svg><div><strong>تنبيه: بروكسيات عامة من مشغّلين خارجيين</strong><p>هذه 60 وصلة أولية من مشغّلين خارجيين، تتجدد تلقائياً عند توفر بيانات المصدر. لم نختبرها من العراق، وجميع حالات القنوات الترويجية غير مؤكدة حالياً. لا يمكننا تبديل القناة التي يعلن عنها مالك البروكسي، أو ضمان الأمان والسرعة. يمكن للمشغّل معرفة IP وأوقات اتصالك. <a href="https://iwizard7.github.io/MTProxy_list/" target="_blank" rel="noopener noreferrer">المصدر ومنهجية الفحص</a>.</p></div></div>
+        <div class="subheading"><h3>السيرفرات العامة</h3><span class="count" id="public-label">0</span><span class="subheading-tail" id="public-updated"></span></div>
+        <div class="proxy-controls">
+          <input id="public-search" aria-label="بحث في السيرفرات العامة" type="search" autocomplete="off" placeholder="بحث باسم الخادم أو عنوانه...">
+          <label class="no-ads-label"><input type="checkbox" id="only-no-ads"> عرض ما ثبت خلوه من قناة ترويجية فقط</label>
+          <span class="subheading-tail" id="shown-public"></span>
+        </div>
+        <div class="server-grid" id="public-list" aria-live="polite"></div>
+        <div class="proxy-more"><button type="button" id="toggle-public" class="button button--outline">عرض حتى 60 بروكسي</button><p>ترتيب القائمة بحسب فحص خارجي، وليس اختبار سرعة داخل العراق. لا توجد نتائج مؤكدة خالية من الإعلانات حتى الآن.</p></div>
+        <div class="subheading subheading--saved"><h3>سيرفراتي المحفوظة</h3><span class="count" id="saved-label">0</span></div>
+        <div class="server-grid" id="saved-list" aria-live="polite"></div>
+        <div class="storage-note"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#lock"/></svg> الروابط التي تضيفها تُحفظ في متصفحك فقط. يمكن فقدانها عند مسح بيانات المتصفح؛ يمكنك تصدير نسخة احتياطية.</div>
+        <div class="mini-tools"><button class="text-button" id="export-btn" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#download"/></svg> تصدير سيرفراتي</button><button class="text-button" id="import-file-btn" type="button"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#upload"/></svg> استيراد نسخة احتياطية</button><input type="file" id="backup-file" accept=".json,application/json" hidden aria-label="اختيار نسخة JSON"></div>
+      </section>
+
+      <section class="section add-layout" id="add" aria-labelledby="add-heading">
+        <div class="add-copy"><div class="overline">QUICK SETUP <span>·</span> 30 SECONDS</div><h2 id="add-heading">عندك رابط بروكسي؟<br><span class="gradient-text">أضِفه بثوانٍ.</span></h2><p>الصق رابط MTProto من مصدر موثوق أو أدخل بياناته يدوياً. تقدر تستخدمه من الموقع بأي وقت.</p><div class="tip-box"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#shield"/></svg><div><strong>خصوصيتك أولاً</strong><span>صاحب البروكسي يمكنه رؤية عنوان IP الخاص بك وأوقات الاتصال، لذلك اختر مصدراً تثق به. لا ترسل رموز تسجيل الدخول لأي أحد.</span></div></div></div>
+        <div class="form-panel glass-panel"><div class="form-head"><span class="form-emblem"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#plus"/></svg></span><div><strong>إضافة اتصال جديد</strong><small>MTProto proxy configuration</small></div></div>
+          <div class="field"><label for="proxy-link">رابط تيليجرام</label><div class="input-inline"><input id="proxy-link" type="url" dir="ltr" spellcheck="false" autocomplete="off" placeholder="https://t.me/proxy?server=…"><button id="parse-link" class="button button--outline button--small" type="button">استخراج</button></div></div>
+          <div class="form-divider"><span>أو أدخل البيانات بنفسك</span></div>
+          <form id="proxy-form" novalidate>
+            <div class="field"><label for="proxy-name">اسم البروكسي <small>اختياري</small></label><input id="proxy-name" type="text" maxlength="60" autocomplete="off" placeholder="مثال: السيرفر الخاص بي"></div>
+            <div class="field"><label for="proxy-host">عنوان الخادم <span class="required">*</span></label><input id="proxy-host" type="text" dir="ltr" spellcheck="false" autocomplete="off" required placeholder="proxy.example.org"></div>
+            <div class="field-split"><div class="field"><label for="proxy-port">المنفذ <span class="required">*</span></label><input id="proxy-port" type="number" inputmode="numeric" min="1" max="65535" required placeholder="443"></div><div class="field"><label for="proxy-secret">مفتاح MTProto <span class="required">*</span></label><input id="proxy-secret" type="text" dir="ltr" spellcheck="false" autocomplete="off" required placeholder="32 hex characters…"></div></div>
+            <p id="form-error" class="form-error" role="alert" hidden></p><button class="button button--primary button--full" type="submit"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#bookmark"/></svg> حفظ البروكسي على جهازي</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="section how" id="how" aria-labelledby="how-heading"><div class="overline overline--center">SIMPLE BY DESIGN</div><h2 id="how-heading">ثلاث خطوات وبس.</h2><p class="how-intro">لا تحتاج تثبيت تطبيق آخر؛ فقط رابط MTProto وتيليجرام.</p><div class="steps"><article><span>01</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#server"/></svg><h3>اختر البروكسي</h3><p>من قائمتك الخاصة أو من روابط مجتمعية خارجية، مع مراجعة المصدر والمخاطر.</p></article><article><span>02</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#send"/></svg><h3>افتح تيليجرام</h3><p>اضغط زر الاتصال، ثم وافق على إضافة البروكسي داخل تيليجرام.</p></article><article><span>03</span><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#layers"/></svg><h3>أضف بديلاً</h3><p>احفظ أكثر من خادم وفعّل التبديل التلقائي في إعدادات تيليجرام.</p></article></div></section>
+
+      <section class="bot-cta glass-panel"><span class="bot-logo"><svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#send"/></svg></span><div><strong>قناة QMR7S والبوت الرسمي</strong><p>تابع <a href="https://t.me/QMR7S" target="_blank" rel="noopener noreferrer">@QMR7S</a> لأخبار المشروع، واستخدم البوت للوصول للروابط. هذا الرابط لا يستبدل إعلانات المشغّلين الخارجيين في تيليجرام.</p></div><a class="button button--outline" target="_blank" rel="noopener noreferrer" href="https://t.me/QMRProxybot">فتح البوت <svg class="icon" aria-hidden="true"><use href="./assets/icons.svg#external"/></svg></a></section>
+
+      <section class="section faq" id="faq" aria-labelledby="faq-heading"><div class="overline">FAQ</div><h2 id="faq-heading">أسئلة مهمة</h2><details><summary>هل الموقع وحده يفك حظر تيليجرام؟</summary><p>لا. الموقع يوفر إدارة الروابط، بينما الاتصال الفعلي يحتاج خادم MTProto يعمل ويمكن الوصول إليه من شبكتك. المتصفح لا يعمل كخادم TCP للبروكسي.</p></details><details><summary>لماذا تظهر قناة غير QMR7S أعلى تيليجرام؟</summary><p>هذه قناة ترويجية يحددها مالك خادم البروكسي الخارجي. لا يمكن للموقع أو البوت تغييرها. لإظهار QMR7S كقناة ترويجية داخل تيليجرام نحتاج خادماً خاصاً بنا يدعم ad tag ونربطه بقناتنا عبر @MTProxybot.</p></details><details><summary>هل يوجد اتصال بضغطة واحدة؟</summary><p>الزر يفتح إعداد البروكسي في تيليجرام لتوافق عليه. لا يستطيع الموقع تفعيل بروكسي تيليجرام سراً أو تغييره دون موافقتك.</p></details><details><summary>هل أقدر أثبّت الموقع على الشاشة الرئيسية؟</summary><p>نعم. على Android افتح الموقع باستخدام Chrome ثم من قائمة ⋮ اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» إذا لم يظهر عرض التثبيت.</p></details><details><summary>هل السيرفرات المحفوظة تعمل بدون إنترنت؟</summary><p>يمكن استعراض إعدادات محفوظة عند توفر النسخة المخزنة من الموقع، لكن الاتصال بتيليجرام يتطلب الإنترنت وسيرفراً فعلياً قابلاً للوصول.</p></details><details><summary>شلون أحافظ على بياناتي؟</summary><p>استخدم «تصدير سيرفراتي» لحفظ ملف JSON محلياً. لا تشارك الملف مع أشخاص لا تثق بهم، لأنه يحتوي على بيانات البروكسي الخاصة بك.</p></details></section>
+    </main>
+    <footer class="footer"><span>© 2026 QMR7S · QMR Proxy</span><span>أداة إدارة روابط اتصال تيليجرام وليست VPN أو خدمة بروكسي قائمة بذاتها.</span><a href="#top">العودة للأعلى ↑</a></footer>
+  </div>
+  <div id="toast" class="toast" aria-live="polite" role="status" hidden></div>
+  <dialog id="delete-dialog" class="confirm-dialog"><form method="dialog"><h3>حذف البروكسي؟</h3><p>سينحذف من هذا المتصفح فقط، ولن يؤثر على إعداد تيليجرام نفسه.</p><div class="confirm-actions"><button type="submit" value="cancel" class="button button--outline">إلغاء</button><button type="submit" value="confirm" class="button button--danger">حذف</button></div></form></dialog>
+</body>
+</html>

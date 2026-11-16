@@ -28,7 +28,7 @@ export default async function(message) {
     const member=await checkSubscription(uid);
     return sendScreen(chatId,member.ok ? {text:text.welcome,reply_markup:home(owner)}:subscriptionScreen(member));
   }
-  if (['/help','/terms','/privacy','/support','/steps','/about','/channel'].includes(command)) {
+  if (['/help','/terms','/privacy','/support','/steps','/about','/channel','/app','/faq','/safety'].includes(command)) {
     return sendScreen(chatId,genericScreen(command.slice(1),owner));
   }
   if (command==='/delete_my_data') {
@@ -39,26 +39,7 @@ export default async function(message) {
   if (owner) {
     if (command==='/admin'||command==='/panel'||command==='/stats') return sendScreen(chatId,await adminScreen());
     if (command==='/setup') {
-      const commands=[
-        {command:'start',description:'القائمة الرئيسية'},
-        {command:'servers',description:'روابط MTProto المجتمعية'},
-        {command:'proxy',description:'روابط الاتصال'},
-        {command:'steps',description:'طريقة إعداد الاتصال'},
-        {command:'channel',description:'قناة QMR7S'},
-        {command:'terms',description:'شروط الاستخدام'},
-        {command:'privacy',description:'سياسة الخصوصية'},
-        {command:'support',description:'تواصل مع الدعم'},
-        {command:'help',description:'الأوامر والمساعدة'},
-      ];
-      const result=[];
-      for (const [label,op] of [
-        ['الأوامر',()=>api.setMyCommands({commands})],
-        ['الوصف',()=>api.setMyDescription({description:'QMR Proxy من QMR7S — بوت تفاعلي يعرض روابط MTProto العامة، مع قائمة متجددة وخطوات استخدام ودعم فني. الروابط من مشغلين خارجيين؛ لا نضمن السرعة أو الأمان أو تجاوز جميع أنواع الحجب. الدعم: @QMRSupportbot'})],
-        ['الوصف القصير',()=>api.setMyShortDescription({short_description:'QMR Proxy | روابط MTProto متجددة • قناة @QMR7S • دعم @QMRSupportbot'})],
-      ]) {
-        try {await op();result.push('✅ '+label);} catch (_) {result.push('⚠️ تعذر تحديث '+label);}
-      }
-      return sendScreen(chatId,{text:'⚙️ إعدادات ملف البوت\n\n'+result.join('\n')+'\n\nالصورة الشخصية تحتاج ملف صورة مستقل وإجراء رفع منفصل. لم تُغيّر صورة البوت.'});
+      return sendScreen(chatId,{text:'⚙️ إعداد الملف الشخصي للبوت\n\nلرفع صورة البوت والوصف وتفعيل زر Mini App، استخدم السكربت الآمن scripts/configure_profile.py من Termux بعد تدوير التوكن المكشوف عبر BotFather.\n\nلا ترسل التوكن إلى المحادثة أو تضعه في GitHub. السكربت يتحقق من هوية البوت، يحفظ نسخة محلية من المعلومات القديمة، ولا يغيّر Webhook.\n\nيمكن تفعيل Main Mini App وصور المعاينة في @BotFather.'});
     }
     if (command==='/maintenance') {
       if (!['on','off'].includes(arg)) return sendScreen(chatId,{text:'استخدم /maintenance on أو /maintenance off'});
