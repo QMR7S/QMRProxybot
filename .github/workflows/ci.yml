@@ -20,3 +20,4 @@ jobs:
           node --check site/sw.js
           node --check tgcloud/handlers/message.js
           node --check tgcloud/lib/nodes.js
+          node --check tgcloud/lib/source.js
