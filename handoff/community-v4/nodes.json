@@ -1,0 +1,44 @@
+{
+  "updated_at": "2026-11-16T06:25:41Z",
+  "source_checked_at": "2026-11-16T06:25:41Z",
+  "source_url": "https://iwizard7.github.io/MTProxy_list/best.txt",
+  "source_note": "Third-party published MTProto links. Not owned by QMR7S; no Iraq connectivity or operator trust check performed.",
+  "nodes": [
+    {
+      "id": "community-01",
+      "name": "مجتمعي 01 — خارجي",
+      "server": "dokhtar.nanaz.co.uk",
+      "port": 8443,
+      "secret": "EERighJJvXrFGRMCIMJdCQ",
+      "source": "third_party",
+      "enabled": true
+    },
+    {
+      "id": "community-02",
+      "name": "مجتمعي 02 — خارجي",
+      "server": "team.fast--pro.co.uk",
+      "port": 443,
+      "secret": "3RBEYoISSb16xRkTAiDCXQk",
+      "source": "third_party",
+      "enabled": true
+    },
+    {
+      "id": "community-03",
+      "name": "مجتمعي 03 — خارجي",
+      "server": "zenon.flashspder.info",
+      "port": 8443,
+      "secret": "1603010200010001fc030386e24c3add",
+      "source": "third_party",
+      "enabled": true
+    },
+    {
+      "id": "community-04",
+      "name": "مجتمعي 04 — خارجي",
+      "server": "194.120.230.37",
+      "port": 443,
+      "secret": "3XnnAQIAAQAH8AMDhuJMOt0",
+      "source": "third_party",
+      "enabled": true
+    }
+  ]
+}
