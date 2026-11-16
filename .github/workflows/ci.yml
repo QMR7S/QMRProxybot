@@ -20,4 +20,11 @@ jobs:
           node --check site/sw.js
           node --check tgcloud/handlers/message.js
           node --check tgcloud/lib/nodes.js
-          node --check tgcloud/lib/source.js
+          node --check tgcloud/lib/ui.js
+          node --check tgcloud/lib/store.js
+          node --check tgcloud/handlers/callback_query.js
+          node --check tgcloud/schema.js
+      - name: QMR Proxy v6 simulated flows
+        run: node tests/smoke.mjs
+      - name: TGCloud root repair syntax
+        run: bash -n scripts/repair-tgcloud-root.sh

@@ -1,4 +1,5 @@
-// Source-vetted public community MTProto links, not owned by QMR7S; ad status unknown.
+// QMR Proxy v5 community cache. Operators are third parties; ads status UNKNOWN.
+export const PUBLIC_SITE_URL = "https://qmr-proxy.alialnyamy675.chatgpt.site";
 export const nodes = [
   {
     "id": "community-01",
@@ -7,7 +8,7 @@ export const nodes = [
     "port": 8443,
     "secret": "EERighJJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 366,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -20,7 +21,7 @@ export const nodes = [
     "port": 443,
     "secret": "3RBEYoISSb16xRkTAiDCXQk",
     "median_rtt_ms": 372,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -33,7 +34,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 402,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -46,7 +47,7 @@ export const nodes = [
     "port": 8443,
     "secret": "EERighJJvXrFGRMCIMjdCQ",
     "median_rtt_ms": 408,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -59,7 +60,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 413,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -72,7 +73,7 @@ export const nodes = [
     "port": 8443,
     "secret": "EERighJJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 414,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -85,7 +86,7 @@ export const nodes = [
     "port": 7443,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 419,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -98,7 +99,7 @@ export const nodes = [
     "port": 8443,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 422,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -111,7 +112,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 425,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -124,7 +125,7 @@ export const nodes = [
     "port": 8443,
     "secret": "EERighJJvXrFGRMCIMjdCQ",
     "median_rtt_ms": 430,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -137,7 +138,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 437,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -150,7 +151,7 @@ export const nodes = [
     "port": 4455,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 441,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -163,7 +164,7 @@ export const nodes = [
     "port": 443,
     "secret": "YyEEgYdJXfrFmgMCIMJdjjRueWVrdGFuZXQA",
     "median_rtt_ms": 446,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -176,7 +177,7 @@ export const nodes = [
     "port": 4455,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 446,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -189,7 +190,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 447,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -202,7 +203,7 @@ export const nodes = [
     "port": 2096,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 451,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -215,7 +216,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 452,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -228,7 +229,7 @@ export const nodes = [
     "port": 4455,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 453,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -241,7 +242,7 @@ export const nodes = [
     "port": 9443,
     "secret": "YyEEgYdJXfrFmgMCIMJdjjRueWVrdGFuZXQA",
     "median_rtt_ms": 454,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -254,7 +255,7 @@ export const nodes = [
     "port": 443,
     "secret": "3XnnAQIAAQAH8AMDhuJMOt0",
     "median_rtt_ms": 455,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -267,7 +268,7 @@ export const nodes = [
     "port": 443,
     "secret": "3XnnAQIAAQAH8AMDhuJMOt0",
     "median_rtt_ms": 458,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 9,
     "ads_status": "unknown",
     "source": "third_party",
@@ -280,7 +281,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 458,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -293,7 +294,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 459,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -306,7 +307,7 @@ export const nodes = [
     "port": 8443,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 460,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -319,7 +320,7 @@ export const nodes = [
     "port": 2083,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 460,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -332,7 +333,7 @@ export const nodes = [
     "port": 2053,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 461,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -345,7 +346,7 @@ export const nodes = [
     "port": 8443,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQAAq5W5G55ZWt0YW5ldC5jb21mYXJheqF2LmNvbXZhbi5uYWp2YS5jb20AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     "median_rtt_ms": 461,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -358,7 +359,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 462,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -371,7 +372,7 @@ export const nodes = [
     "port": 8443,
     "secret": "EERighJJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 463,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -384,7 +385,7 @@ export const nodes = [
     "port": 2053,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 464,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -397,7 +398,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 464,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -410,7 +411,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 465,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -423,7 +424,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 465,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -436,7 +437,7 @@ export const nodes = [
     "port": 2053,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 466,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -449,7 +450,7 @@ export const nodes = [
     "port": 2096,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 467,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -462,7 +463,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 468,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -475,7 +476,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 469,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -488,7 +489,7 @@ export const nodes = [
     "port": 2096,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 471,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -501,7 +502,7 @@ export const nodes = [
     "port": 8880,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 472,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -514,7 +515,7 @@ export const nodes = [
     "port": 8443,
     "secret": "eeNEgYdJvXrFGRMCIMJdCQ",
     "median_rtt_ms": 473,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -527,7 +528,7 @@ export const nodes = [
     "port": 4455,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 457,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -540,7 +541,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 457,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -553,7 +554,7 @@ export const nodes = [
     "port": 8443,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 457,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -566,7 +567,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 459,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -579,7 +580,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 461,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -592,7 +593,7 @@ export const nodes = [
     "port": 8443,
     "secret": "dd5f7ce28a2c4816c6c923dfd4d5630e01dd",
     "median_rtt_ms": 465,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 9,
     "ads_status": "unknown",
     "source": "third_party",
@@ -605,7 +606,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 465,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -618,7 +619,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 465,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -631,7 +632,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 468,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -644,7 +645,7 @@ export const nodes = [
     "port": 75,
     "secret": "ameuTC0XO0FodFQ1yzE6OQQ1yzE60Q",
     "median_rtt_ms": 468,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -657,7 +658,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 474,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -670,7 +671,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 474,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -683,7 +684,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 474,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -696,7 +697,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 475,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -709,7 +710,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 475,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -722,7 +723,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 475,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -735,7 +736,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 478,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -748,7 +749,7 @@ export const nodes = [
     "port": 8443,
     "secret": "1603010200010001fc030386e24c3add",
     "median_rtt_ms": 480,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -761,7 +762,7 @@ export const nodes = [
     "port": 8443,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 481,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
@@ -774,11 +775,67 @@ export const nodes = [
     "port": 8443,
     "secret": "dd104462821249bd7ac519130220c25d09",
     "median_rtt_ms": 483,
-    "success_rate": 1,
+    "success_rate": 1.0,
     "samples": 10,
     "ads_status": "unknown",
     "source": "third_party",
     "enabled": true
   }
 ];
-export const PUBLIC_SITE_URL = 'https://qmr-proxy.alialnyamy675.chatgpt.site';
+
+// One existing `lib/nodes` module is enough: no extra `lib/source` to deploy.
+// This is a third-party health feed, not a speed test from Iraqi networks.
+const FEED_URL = 'https://iwizard7.github.io/MTProxy_list/endpoints.json';
+const MAX_FEED_AGE_MS = 36 * 60 * 60 * 1000;
+let cached = null;
+let cachedAt = 0;
+
+function validFeedNode(n) {
+  return n && typeof n.server === 'string'
+    && /^[A-Za-z0-9.-]{1,253}$/.test(n.server)
+    && Number.isInteger(n.port) && n.port > 0 && n.port <= 65535
+    && typeof n.secret === 'string'
+    && (/^[0-9a-fA-F]{32,512}$/.test(n.secret)
+        || /^[A-Za-z0-9_-]{22,684}={0,2}$/.test(n.secret));
+}
+
+export function selectLiveNodes(data, now = Date.now()) {
+  if (!data || !Array.isArray(data.endpoints)) return null;
+  const stamp = Date.parse(data.updated_at || '');
+  if (!Number.isFinite(stamp) || stamp > now + 600000 || now - stamp > MAX_FEED_AGE_MS) return null;
+  const seen = new Set();
+  const selected = data.endpoints.filter(n => n.verified === true
+    && n.ads?.status !== 'present'
+    && n.success_rate >= 0.8 && n.samples >= 5
+    && Number.isFinite(n.median_rtt_ms) && validFeedNode(n))
+    .sort((a,b) => b.success_rate - a.success_rate || a.median_rtt_ms - b.median_rtt_ms)
+    .filter(n => {
+      const key = n.server.toLowerCase() + ':' + n.port;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 60).map((n,i) => ({
+      name: 'مجتمعي ' + String(i + 1).padStart(2,'0') + ' — خارجي',
+      server: n.server, port: n.port, secret: n.secret,
+      source: 'third_party', enabled: true,
+      ads_status: n.ads?.status || 'unknown',
+      median_rtt_ms: Math.round(n.median_rtt_ms),
+    }));
+  if (selected.length < 20) return null;
+  return { nodes: selected, updated_at: data.updated_at, from: 'remote' };
+}
+
+export async function getNodes(sdkFetch) {
+  if (cached && Date.now() - cachedAt < 10 * 60 * 1000) return cached;
+  if (typeof sdkFetch === 'function') {
+    try {
+      const response = await sdkFetch(FEED_URL);
+      if (!response.ok) throw Error('Source HTTP error');
+      const validated = selectLiveNodes(await response.json());
+      if (validated) {
+        cached = validated; cachedAt = Date.now(); return validated;
+      }
+    } catch (_) { /* falling back to the fixed public snapshot */ }
+  }
+  return {nodes: nodes.filter(n => n.enabled !== false), updated_at: '2026-11-16T06:25:41.547232+00:00', from: 'snapshot'};
+}
