@@ -20,6 +20,10 @@ def main():
   if not isinstance(n.get('secret'),str) or not re.fullmatch(r'[A-Za-z0-9_-]{16,}',n['secret']): p.error('bad public secret')
   good.append({k:n[k] for k in ('name','server','port','secret','enabled') if k in n})
  target=R/'tgcloud/lib/nodes.js'
+ # This legacy generator cannot preserve the current module's validation,
+ # remote feed and fallback behavior. Refuse before writing any output.
+ if target.exists() and re.search(r'export\s+(?:async\s+)?function\s+(?:getNodes|selectLiveNodes)\b', target.read_text(encoding='utf8')):
+  p.error('Refusing to replace the live-feed module with legacy static exports. Update its reviewed snapshot explicitly; no files changed.')
  result='// Auto-generated public MTProto links; does not mutate Telegram.\nexport const PUBLIC_SITE_URL = '+json.dumps(a.web_url,ensure_ascii=False)+';\nexport const nodes = '+json.dumps(good,ensure_ascii=False,indent=2)+';\n'
  target.write_text(result,encoding='utf8')
  print('Generated',len(good),'node entries. No network health or Serverless deployment occurred.')
