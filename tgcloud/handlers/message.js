@@ -1,6 +1,6 @@
 // Staged Telegram Serverless handler; deploy targeted modules only after a live diff.
 import { api, fetch as sdkFetch } from 'sdk';
-import { currentNodes } from '../lib/source.js';
+import { currentNodes } from 'lib/source';
 
 const WEBSITE = 'https://qmr-proxy.alialnyamy675.chatgpt.site';
 const CHANNEL = 'https://t.me/QMR7S';
