@@ -6,7 +6,7 @@ The bot token was posted in chat and must be revoked in @BotFather. Do not use t
 
 ## Bot code
 
-The source is under `bot/`. Telegram Serverless production is not updated simply because the GitHub branch changes.
+The bot source is under `tgcloud/`; the website release source is under `handoff/miniapp-v7/site/`. Telegram Serverless production is not updated simply because GitHub changes.
 
 1. Read-only: `npx tgcloud fetch && npx tgcloud status && npx tgcloud diff` from the actual linked project root, confirm the bot ID remains `9239734904`.
 2. Save a copy of the currently deployed handlers and webhook settings. Do not use `tgcloud pull` over your new source.
@@ -23,7 +23,7 @@ For a *profile* Open App button and preview gallery, enable **Main Mini App** vi
 
 ## ChatGPT Sites
 
-Work must update **existing** https://qmr-proxy.alialnyamy675.chatgpt.site using this package's `site/`, not create a second site. This preserves the v5 design, 60 third-party links, storage key and existing PWA data. Test on a real phone before announcing.
+Work must update **existing** https://qmr-proxy.alialnyamy675.chatgpt.site using `handoff/miniapp-v7/site/`, not the obsolete repository-root `site/` folder, and must not create a second site. This preserves the v5 design, 60 third-party links, storage key and existing PWA data. Test on a real phone before announcing.
 
 ## Rollback
 
