@@ -32,6 +32,7 @@ try {
     export const index=()=>({on(){return {}}});
     export const sql=(s,...xs)=>'';
     export const eq=()=>({});export const gt=()=>({});export const asc=()=>({});
+    export const and=()=>({});export const inArray=()=>({});
   `);
   globalThis.qmrTest={membership:'left',memberError:false,messages:[],edits:[],answers:[]};
   const m=(await import(pathToFileURL(path.join(tmp,'tgcloud/handlers/message.js')).href)).default;
