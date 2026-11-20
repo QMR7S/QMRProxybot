@@ -125,6 +125,20 @@
       + '&secret=' + encodeURIComponent(node.secret);
   }
 
+  function openProxyInTelegram(node) {
+    const webUrl = makeUrl(node, 'https://t.me/proxy');
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg && tg.platform && tg.platform !== 'unknown' && typeof tg.openTelegramLink === 'function') {
+      try {
+        tg.openTelegramLink(webUrl);
+        notify('سيطلب Telegram تأكيد إضافة البروكسي؛ الاتصال الفعلي يعتمد على الخادم.');
+        return;
+      } catch (_) { /* Fall back to the Telegram URL scheme. */ }
+    }
+    window.location.assign(makeUrl(node));
+    notify('إذا لم يظهر Telegram، استخدم زر «نسخ» أو «رابط بديل».');
+  }
+
   async function copyLink(node) {
     const text = makeUrl(node, 'https://t.me/proxy');
     try {
@@ -195,9 +209,7 @@
     }
 
     const actions = nodeElement('div', 'server-actions');
-    const open = nodeElement('a', 'button button--primary');
-    open.href = makeUrl(node);
-    open.append(icon('send'), nodeElement('span', '', 'فتح في تيليجرام'));
+    const open = button('فتح في تيليجرام', 'button--primary', () => openProxyInTelegram(node), 'send');
     open.setAttribute('aria-label', 'فتح إعداد بروكسي ' + node.name + ' في تيليجرام');
     const web = nodeElement('a', 'button button--outline');
     web.href = makeUrl(node, 'https://t.me/proxy');
