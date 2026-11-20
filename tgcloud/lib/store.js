@@ -74,7 +74,7 @@ export async function broadcastBatch(id, api) {
     cursorId=u.userId;
     try {
       if (!(await isBlocked(u.userId))) {
-        await api.sendMessage({chat_id:u.userId,text:'📣 إشعار QMR Proxy\\n\\n'+initial.content,
+        await api.sendMessage({chat_id:u.userId,text:'📣 إشعار QMR Proxy\n\n'+initial.content,
           link_preview_options:{is_disabled:true}});
         await db.update(qmrBroadcasts)
           .set({sent:sql`${qmrBroadcasts.sent} + 1`})
