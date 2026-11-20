@@ -1,5 +1,5 @@
 /* Cache shell for PWA. Cache is for availability of the interface, NOT a proxy connection. */
-const CACHE = 'qmrproxy-shell-v7-miniapp-20261116';
+const CACHE = 'qmrproxy-shell-v7-miniapp-connectionfix-20261120';
 const SHELL = [
   './', './index.html', './styles.css', './app.js',
   './telegram-miniapp.js', './manifest.webmanifest', './assets/icon.svg', './assets/icon-192.png',
