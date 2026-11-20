@@ -68,7 +68,8 @@ export async function serversScreen(page=1) {
   const result=await getNodes(sdkFetch);
   const all=Array.isArray(result.nodes)?result.nodes:[];
   const max=Math.max(1,Math.ceil(all.length/10));
-  const p=Math.min(max,Math.max(1,Number(page)||1));
+  const requestedPage=Number(page);
+  const p=Number.isInteger(requestedPage)?Math.min(max,Math.max(1,requestedPage)):1;
   const listed=all.slice((p-1)*10,p*10);
   if (!listed.length) return {text:'لا توجد روابط مدرجة الآن. راجع الموقع أو حاول لاحقاً.',reply_markup:backKeyboard()};
   const lines=listed.map((n,i)=>{

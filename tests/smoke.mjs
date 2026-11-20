@@ -32,6 +32,7 @@ try {
     export const index=()=>({on(){return {}}});
     export const sql=(s,...xs)=>'';
     export const eq=()=>({});export const gt=()=>({});export const asc=()=>({});
+    export const and=()=>({});export const inArray=()=>({});
   `);
   globalThis.qmrTest={membership:'left',memberError:false,messages:[],edits:[],answers:[]};
   const m=(await import(pathToFileURL(path.join(tmp,'tgcloud/handlers/message.js')).href)).default;
@@ -53,6 +54,11 @@ try {
   const listed=globalThis.qmrTest.messages.at(-1);
   assert.match(listed.text,/11\. /);
   assert.equal(listed.reply_markup.inline_keyboard.filter(row=>row[0].url?.includes('t.me/proxy')).length,10);
+  reset();
+  await m(fakeUser(10001,'/servers 1.5'));
+  assert.match(globalThis.qmrTest.messages.at(-1).text,/01\. /);
+  assert.ok(globalThis.qmrTest.messages.at(-1).reply_markup.inline_keyboard.flat()
+    .some(button=>button.callback_data==='q:servers:2'));
   reset();
   await m(fakeUser(10001,'/admin'));
   assert.doesNotMatch(globalThis.qmrTest.messages.at(-1)?.text||'',/لوحة إدارة QMR Proxy/);
