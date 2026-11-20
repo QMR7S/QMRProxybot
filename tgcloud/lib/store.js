@@ -1,6 +1,6 @@
 // Minimal privacy-preserving database access. No message bodies or usernames tracked.
 import { db } from 'sdk';
-import { eq, gt, asc, sql } from 'sdk/db';
+import { eq, gt, asc, and, inArray, sql } from 'sdk/db';
 import { qmrUsers, qmrSettings, qmrBroadcasts } from '../schema.js';
 
 const unix = () => Math.floor(Date.now()/1000);
@@ -50,30 +50,55 @@ export async function broadcastById(id) {
 export async function cancelBroadcast(id) {
   await db.update(qmrBroadcasts).set({status:'cancelled'}).where(eq(qmrBroadcasts.id,id)).run();
 }
+// Reserve each recipient with a compare-and-swap before delivery. Concurrent
+// callbacks can no longer deliver the same recipient twice from one draft.
+// Counters are incremented atomically to avoid lost updates between workers.
 export async function broadcastBatch(id, api) {
-  let b=await broadcastById(id);
-  if (!b || !['draft','sending'].includes(b.status)) return null;
-  if (b.status==='draft') {
-    await db.update(qmrBroadcasts).set({status:'sending'}).where(eq(qmrBroadcasts.id,id)).run();
-    b.status='sending';
-  }
+  const initial=await broadcastById(id);
+  if (!initial || !['draft','sending'].includes(initial.status)) return null;
+
+  let cursorId=initial.cursorId;
   const people=await db.select({userId:qmrUsers.userId}).from(qmrUsers)
-    .where(gt(qmrUsers.userId,b.cursorId)).orderBy(asc(qmrUsers.userId)).limit(15).all();
-  let sent=b.sent,failed=b.failed,cursorId=b.cursorId;
+    .where(gt(qmrUsers.userId,cursorId)).orderBy(asc(qmrUsers.userId)).limit(15).all();
+
   for (const u of people) {
+    const reserved=await db.update(qmrBroadcasts)
+      .set({cursorId:u.userId,status:'sending'})
+      .where(and(
+        eq(qmrBroadcasts.id,id),
+        eq(qmrBroadcasts.cursorId,cursorId),
+        inArray(qmrBroadcasts.status,['draft','sending'])
+      ))
+      .returning({id:qmrBroadcasts.id}).run();
+    if (!reserved?.length) break; // Another request already advanced the draft.
     cursorId=u.userId;
-    // Persist BEFORE sending to prevent duplicate deliveries on interrupted requests.
-    await db.update(qmrBroadcasts).set({cursorId}).where(eq(qmrBroadcasts.id,id)).run();
     try {
       if (!(await isBlocked(u.userId))) {
-        await api.sendMessage({chat_id:u.userId,text:'📣 إشعار QMR Proxy\n\n'+b.content,
+        await api.sendMessage({chat_id:u.userId,text:'📣 إشعار QMR Proxy\\n\\n'+initial.content,
           link_preview_options:{is_disabled:true}});
-        sent++;
+        await db.update(qmrBroadcasts)
+          .set({sent:sql`${qmrBroadcasts.sent} + 1`})
+          .where(eq(qmrBroadcasts.id,id)).run();
       }
-    } catch (_){ failed++; }
+    } catch (_) {
+      await db.update(qmrBroadcasts)
+        .set({failed:sql`${qmrBroadcasts.failed} + 1`})
+        .where(eq(qmrBroadcasts.id,id)).run();
+    }
   }
-  const done=people.length<15;
-  await db.update(qmrBroadcasts).set({sent,failed,cursorId,status:done?'done':'sending'})
-    .where(eq(qmrBroadcasts.id,id)).run();
-  return {id,sent,failed,done,cursorId};
+
+  // Check current persisted cursor, not the stale batch snapshot.
+  let current=await broadcastById(id);
+  if (!current) return null;
+  const remaining=await db.select({userId:qmrUsers.userId}).from(qmrUsers)
+    .where(gt(qmrUsers.userId,current.cursorId)).orderBy(asc(qmrUsers.userId)).limit(1).all();
+  if (!remaining.length && current.status==='sending') {
+    await db.update(qmrBroadcasts).set({status:'done'})
+      .where(and(eq(qmrBroadcasts.id,id),
+        eq(qmrBroadcasts.cursorId,current.cursorId),
+        eq(qmrBroadcasts.status,'sending'))).run();
+    current=await broadcastById(id);
+  }
+  return {id,sent:current.sent,failed:current.failed,
+    done:current.status==='done',cursorId:current.cursorId};
 }
