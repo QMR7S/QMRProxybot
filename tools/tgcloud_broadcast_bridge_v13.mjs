@@ -27,11 +27,12 @@ export function createV13DispatchBridge(storage, sendMessage, now = () => Date.n
         }
         // Durable journal transition before any call to Telegram.
         await storage.markAttempt(id,recipient.userId,token,lease.fence,now());
-        let delivered=false, retryAfter=null;
+        let delivered=false, retryAfter=null, sendFailed=false;
         try {
           await sendMessage(recipient.userId,lease.content);
           delivered=true;
         } catch(error) {
+          sendFailed=true;
           const seconds = error?.parameters?.retry_after;
           // Bot API retry_after is in SECONDS; journal retry_after_ms is
           // an absolute Unix millisecond deadline, not a number of seconds.
@@ -56,7 +57,10 @@ export function createV13DispatchBridge(storage, sendMessage, now = () => Date.n
           // Never retry an ambiguous outcome automatically.
           break;
         }
-        if (retryAfter!==null) {stopped='rate-limited';break;}
+        // Stop on *any* delivery exception, not only 429: continuing could
+        // turn every remaining recipient into 'unknown' during an outage.
+        // Leave the remaining recipients pending for an explicit later run.
+        if (sendFailed) {stopped=retryAfter!==null?'rate-limited':'send-error';break;}
       }
       return {status:stopped,sent,uncertain,blocked};
     } finally {
