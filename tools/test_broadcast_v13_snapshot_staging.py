@@ -36,16 +36,16 @@ class SnapshotTests(unittest.TestCase):
         self.assertEqual(self.state(),"sending")
 
     def test_snapshot_immutable_after_user_changes(self):
-        prepare_recipient_snapshot(self.db,1)
+        prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.db.execute("INSERT INTO qmr_users_v6 VALUES(104,0)")
         self.db.execute("UPDATE qmr_users_v6 SET blocked=1 WHERE user_id=101")
         self.assertEqual(self.recipients(),[(101,),(102,)])
         # Dispatch adapter separately rechecks current blocked status.
 
     def test_repeat_rejected_without_changes(self):
-        prepare_recipient_snapshot(self.db,1)
+        prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         with self.assertRaises(SnapshotRejected):
-            prepare_recipient_snapshot(self.db,1)
+            prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.assertEqual(self.recipients(),[(101,),(102,)])
 
     def test_wrong_expected_count_rolls_back(self):
@@ -57,7 +57,7 @@ class SnapshotTests(unittest.TestCase):
     def test_invalid_blocked_flag_rejects_entire_snapshot(self):
         self.db.execute("INSERT INTO qmr_users_v6 VALUES(104,5)")
         with self.assertRaises(SnapshotRejected):
-            prepare_recipient_snapshot(self.db,1)
+            prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.assertEqual(self.recipients(),[])
         self.assertEqual(self.state(),"draft")
 
@@ -65,27 +65,27 @@ class SnapshotTests(unittest.TestCase):
         self.db.execute(
             "INSERT INTO qmr_broadcast_delivery_v13 VALUES (1,101,'pending',0,NULL,NULL,NULL)")
         with self.assertRaises(SnapshotRejected):
-            prepare_recipient_snapshot(self.db,1)
+            prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.assertEqual(self.recipients(),[(101,)])
         self.assertEqual(self.state(),"draft")
 
     def test_cancelled_job_rejected(self):
         self.db.execute("UPDATE qmr_broadcast_jobs_v13 SET state='cancelled' WHERE id=1")
         with self.assertRaises(SnapshotRejected):
-            prepare_recipient_snapshot(self.db,1)
+            prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.assertEqual(self.recipients(),[])
 
     def test_empty_eligible_rejected(self):
         self.db.execute("UPDATE qmr_users_v6 SET blocked=1")
         with self.assertRaises(SnapshotRejected):
-            prepare_recipient_snapshot(self.db,1)
+            prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         self.assertEqual(self.state(),"draft")
 
     def test_no_nested_transaction(self):
         self.db.execute("BEGIN")
         try:
             with self.assertRaises(SnapshotRejected):
-                prepare_recipient_snapshot(self.db,1)
+                prepare_recipient_snapshot(self.db,1,expected_eligible=2)
         finally:
             self.db.rollback()
 
@@ -93,7 +93,21 @@ class SnapshotTests(unittest.TestCase):
         for invalid in (0,-1,True,1.1):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValueError):
-                    prepare_recipient_snapshot(self.db,invalid)
+                    prepare_recipient_snapshot(self.db,invalid,expected_eligible=2)
+
+
+    def test_expected_count_is_required(self):
+        with self.assertRaises(TypeError):
+            prepare_recipient_snapshot(self.db,1)
+        self.assertEqual(self.recipients(),[])
+        self.assertEqual(self.state(),"draft")
+
+    def test_invalid_expected_count_rejected(self):
+        for bad in (0,-1,True,None):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    prepare_recipient_snapshot(self.db,1,expected_eligible=bad)
+        self.assertEqual(self.state(),"draft")
 
 if __name__=="__main__":
     unittest.main()
