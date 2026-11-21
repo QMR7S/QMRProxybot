@@ -73,3 +73,16 @@ test('missing blocklist schema fails closed before Telegram send',async()=>{
     assert.equal(sends,0);assert.equal(state(raw,101),'pending');
   } finally {raw.close();}
 });
+
+test('missing recipient row fails closed even when user table exists',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    raw.exec('DELETE FROM qmr_users_v6 WHERE user_id=101');
+    let sends=0;
+    await assert.rejects(
+      createV13DispatchBridge(adapter,async()=>{sends++;}).dispatch(1,TOKEN_A),
+      /recipient absent from verified user table/);
+    assert.equal(sends,0);
+    assert.equal(state(raw,101),'pending');
+  } finally {raw.close();}
+});
