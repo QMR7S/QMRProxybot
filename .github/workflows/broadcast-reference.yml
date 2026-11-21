@@ -9,6 +9,8 @@ on:
       - 'tgcloud/handlers/callback_query.js'
       - 'tools/owner_callback_guard.test.mjs'
       - 'tools/audit_broadcast_safety.mjs'
+      - 'tgcloud/handlers/message.js'
+      - 'tools/legacy_broadcast_hold.test.mjs'
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
@@ -31,6 +33,8 @@ on:
       - 'tgcloud/handlers/callback_query.js'
       - 'tools/owner_callback_guard.test.mjs'
       - 'tools/audit_broadcast_safety.mjs'
+      - 'tgcloud/handlers/message.js'
+      - 'tools/legacy_broadcast_hold.test.mjs'
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
@@ -76,6 +80,8 @@ jobs:
           node --check tgcloud/lib/owner_callback_guard.js
           node --check tgcloud/handlers/callback_query.js
           node --test tools/owner_callback_guard.test.mjs
+          node --check tgcloud/handlers/message.js
+          node --test tools/legacy_broadcast_hold.test.mjs
           node --check tools/broadcast_v13_sdk_schema_candidate.mjs
       - name: SQLite lease and delivery journal assertions
         run: |
