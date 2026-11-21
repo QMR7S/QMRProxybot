@@ -1,0 +1,30 @@
+name: Broadcast dispatcher isolated tests (review only)
+on:
+  push:
+    branches:
+      - review/qmr-v12-5-production-baseline
+    paths:
+      - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tools/broadcast_dispatcher_reference.test.mjs'
+      - '.github/workflows/broadcast-reference.yml'
+  pull_request:
+    paths:
+      - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tools/broadcast_dispatcher_reference.test.mjs'
+      - '.github/workflows/broadcast-reference.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and isolated dispatcher assertions
+        run: |
+          node --check tools/broadcast_dispatcher_reference.mjs
+          node --check tools/broadcast_dispatcher_reference.test.mjs
+          node --test tools/broadcast_dispatcher_reference.test.mjs
