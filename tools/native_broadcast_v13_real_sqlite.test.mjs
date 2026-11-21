@@ -27,7 +27,7 @@ test('real SQLite executes bridge and journal for all recipients',async()=>{
   const {raw,adapter}=fixture();
   try {
     const result=await createV13DispatchBridge(adapter,async()=>{}).dispatch(1,TOKEN_A);
-    assert.deepEqual(result,{status:'complete',sent:2,uncertain:0,blocked:1});
+    assert.deepEqual(result,{status:'queue-drained',sent:2,uncertain:0,blocked:1});
     assert.equal(state(raw,101),'sent');assert.equal(state(raw,102),'sent');
     assert.equal(state(raw,103),'blocked');
     assert.equal(raw.prepare('SELECT attempts FROM qmr_broadcast_delivery_v13 WHERE user_id=101').get().attempts,1);
@@ -200,5 +200,34 @@ test('invalid reconciliation window is rejected',async()=>{
   try {
     await assert.rejects(adapter.reconciliationSummary(1,10000,10),/invalid reconciliation/);
     await assert.rejects(adapter.reconciliationSummary(1,-1),/invalid reconciliation/);
+  } finally {raw.close();}
+});
+
+test('a full 15-recipient batch is not called a completed broadcast',async()=>{
+  const ids=Array.from({length:18},(_,i)=>i+200);
+  const {raw,adapter}=fixture(ids);
+  try {
+    let count=0;
+    const bridge=createV13DispatchBridge(adapter,async()=>{count++;});
+    const first=await bridge.dispatch(1,TOKEN_A);
+    assert.equal(first.status,'batch-limit');
+    assert.equal(first.sent,15);
+    assert.equal(count,15);
+    assert.equal(raw.prepare("SELECT COUNT(*) AS n FROM qmr_broadcast_delivery_v13 WHERE state='pending'").get().n,3);
+    assert.equal(await adapter.finalize(1,Date.now()),false);
+    const second=await bridge.dispatch(1,TOKEN_B);
+    assert.equal(second.status,'queue-drained');
+    assert.equal(second.sent,3);
+    assert.equal(await adapter.finalize(1,Date.now()),true);
+  } finally {raw.close();}
+});
+test('drained queue is not automatically a finalized campaign if outcomes are unknown',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    const bridge=createV13DispatchBridge(adapter,async()=>{throw Error('timeout');});
+    assert.equal((await bridge.dispatch(1,TOKEN_A)).status,'send-error');
+    assert.equal((await bridge.dispatch(1,TOKEN_B)).status,'queue-drained');
+    assert.equal(await adapter.finalize(1,Date.now()),false);
+    assert.equal(raw.prepare("SELECT state FROM qmr_broadcast_jobs_v13").get().state,'sending');
   } finally {raw.close();}
 });
