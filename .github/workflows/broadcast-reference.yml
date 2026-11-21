@@ -8,6 +8,8 @@ on:
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
+      - 'tools/broadcast_v13_snapshot_staging.py'
+      - 'tools/test_broadcast_v13_snapshot_staging.py'
       - 'tools/tgcloud_broadcast_adapter_v13.mjs'
       - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.mjs'
@@ -21,6 +23,8 @@ on:
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
+      - 'tools/broadcast_v13_snapshot_staging.py'
+      - 'tools/test_broadcast_v13_snapshot_staging.py'
       - 'tools/tgcloud_broadcast_adapter_v13.mjs'
       - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.mjs'
@@ -54,4 +58,6 @@ jobs:
           node --test tools/tgcloud_broadcast_real_sqlite.test.mjs
           node --check tools/broadcast_v13_sdk_schema_candidate.mjs
       - name: SQLite lease and delivery journal assertions
-        run: python3 tools/test_broadcast_v13_sqlite.py -v
+        run: |
+          python3 tools/test_broadcast_v13_sqlite.py -v
+          python3 tools/test_broadcast_v13_snapshot_staging.py -v
