@@ -5,6 +5,10 @@ on:
       - review/qmr-v12-5-production-baseline
     paths:
       - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tgcloud/lib/owner_callback_guard.js'
+      - 'tgcloud/handlers/callback_query.js'
+      - 'tools/owner_callback_guard.test.mjs'
+      - 'tools/audit_broadcast_safety.mjs'
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
@@ -20,6 +24,10 @@ on:
   pull_request:
     paths:
       - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tgcloud/lib/owner_callback_guard.js'
+      - 'tgcloud/handlers/callback_query.js'
+      - 'tools/owner_callback_guard.test.mjs'
+      - 'tools/audit_broadcast_safety.mjs'
       - 'tools/broadcast_dispatcher_reference.test.mjs'
       - 'tools/broadcast_v13_review_schema.sql'
       - 'tools/test_broadcast_v13_sqlite.py'
@@ -56,6 +64,9 @@ jobs:
           node --test tools/tgcloud_broadcast_bridge_v13.test.mjs
           node --check tools/tgcloud_broadcast_real_sqlite.test.mjs
           node --test tools/tgcloud_broadcast_real_sqlite.test.mjs
+          node --check tgcloud/lib/owner_callback_guard.js
+          node --check tgcloud/handlers/callback_query.js
+          node --test tools/owner_callback_guard.test.mjs
           node --check tools/broadcast_v13_sdk_schema_candidate.mjs
       - name: SQLite lease and delivery journal assertions
         run: |
