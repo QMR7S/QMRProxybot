@@ -9,10 +9,11 @@ export function createV13DispatchBridge(storage, sendMessage, now = () => Date.n
     const limit = options.limit ?? 15;
     if (!positive(id) || typeof token !== 'string' || token.length < 16 ||
         token.length > 128 || !positive(limit) || limit > 15) throw Error('invalid dispatch');
-    const lease = await storage.claim(id,token,now(),leaseMs);
+    const startedAt = now();
+    const lease = await storage.claim(id,token,startedAt,leaseMs);
     if (!lease) return {status:'busy',sent:0,uncertain:0,blocked:0};
     let sent=0,uncertain=0,blocked=0,stopped='complete';
-    const deadline=now()+leaseMs;
+    const deadline=startedAt+leaseMs;
     try {
       for (let i=0; i<limit; i++) {
         // Refuse to begin an external send when insufficient lease time remains.
