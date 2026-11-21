@@ -86,3 +86,17 @@ test('missing recipient row fails closed even when user table exists',async()=>{
     assert.equal(state(raw,101),'pending');
   } finally {raw.close();}
 });
+
+test('actual SQLite preserves rest of queue when first Telegram send fails',async()=>{
+  const {raw,adapter}=fixture([101,102]);
+  try {
+    let calls=0;
+    const result=await createV13DispatchBridge(adapter,async()=>{
+      calls++;throw Error('upstream disconnected');
+    }).dispatch(1,TOKEN_A);
+    assert.equal(result.status,'send-error');
+    assert.equal(calls,1);
+    assert.equal(state(raw,101),'unknown');
+    assert.equal(state(raw,102),'pending');
+  } finally {raw.close();}
+});
