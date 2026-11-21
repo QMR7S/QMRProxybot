@@ -1,5 +1,6 @@
 """Tests run only on in-memory synthetic SQLite. No production files."""
 import pathlib
+import tempfile
 import sqlite3
 import unittest
 from broadcast_v13_snapshot_staging import prepare_recipient_snapshot, SnapshotRejected
@@ -108,6 +109,31 @@ class SnapshotTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     prepare_recipient_snapshot(self.db,1,expected_eligible=bad)
         self.assertEqual(self.state(),"draft")
+
+
+    def test_two_file_backed_writers_are_serialized(self):
+        # Verify actual separate SQLite connections, not shared in-memory state.
+        with tempfile.TemporaryDirectory(prefix="qmr-snapshot-test-") as temp:
+            path = pathlib.Path(temp) / "isolated.sqlite"
+            writer = sqlite3.connect(path, isolation_level=None, timeout=0)
+            rival = None
+            try:
+                self.db.backup(writer)
+                rival = sqlite3.connect(path, isolation_level=None, timeout=0)
+                writer.execute("BEGIN IMMEDIATE")
+                with self.assertRaises(sqlite3.OperationalError):
+                    prepare_recipient_snapshot(rival,1,expected_eligible=2)
+                writer.rollback()
+                result = prepare_recipient_snapshot(rival,1,expected_eligible=2)
+                self.assertEqual(result["eligible"],2)
+                with self.assertRaises(SnapshotRejected):
+                    prepare_recipient_snapshot(writer,1,expected_eligible=2)
+                self.assertEqual(writer.execute(
+                    "SELECT COUNT(*) FROM qmr_broadcast_delivery_v13").fetchone()[0],2)
+            finally:
+                if rival is not None:
+                    rival.close()
+                writer.close()
 
 if __name__=="__main__":
     unittest.main()
