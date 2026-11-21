@@ -26,7 +26,7 @@ gate('per-recipient-reconciliation', durableLedger,
 const exclusiveClaim = /claimBatch|dispatchLease|exclusiveLease|transaction/.test(batch);
 gate('exclusive-batch-ownership', exclusiveClaim,
   'Protect overlapping callbacks with an atomic claim or serialized dispatcher.');
-const ownerGuard = /if\s*\(ownerOnly\(data\)\s*&&\s*!owner\)/.test(callbacks);
+const ownerGuard = /if\s*\(ownerOnly\(data\)\s*&&\s*!ownerCallbackAllowed\(query,\s*IS_OWNER\)\)/.test(callbacks);
 gate('owner-callback-guard-present', ownerGuard,
   'This checks source shape only; separately test all privileged callbacks as non-owner.');
 console.log(JSON.stringify({gate:'broadcast-migration',status:failures.length?'BLOCKED':'STRUCTURAL_CHECKS_PASSED',failures}));
