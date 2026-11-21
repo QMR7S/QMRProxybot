@@ -1,0 +1,7 @@
+/* v11.3 supplemental community feed */
+.q-extra-note{margin:12px 0 10px;padding:13px 16px;border-radius:14px;border:1px solid rgba(91,199,215,.3);background:linear-gradient(115deg,rgba(26,66,96,.38),rgba(54,37,97,.23));color:#d2e8f2;font-size:12px;line-height:1.9}
+.q-extra-note strong{color:#8ae5e0}.q-extra-note a{color:#a9c8ff}
+.q-extra-stats{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}.q-extra-stats span{padding:4px 9px;border:1px solid #b1bdff33;border-radius:100px;color:#accde2;font-size:11px}
+.studio-proxy-sub,.studio-proxy-title{overflow-wrap:anywhere}
+.q-drawer-item{cursor:pointer;touch-action:manipulation}
+@media (max-width:560px){.q-drawer-preview{min-height:70px;padding:9px 14px!important}.q-extra-note{font-size:11px}}

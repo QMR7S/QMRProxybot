@@ -1,0 +1,12 @@
+{
+  "QMRProxy_v12_3_Smart_Interface/monitor.py": "7bf591c3d22e34653ccd81ace9d8c62dbb2f5bfb83a416587980705c6647bba9",
+  "QMRProxy_v12_3_Smart_Interface/base_monitor.py": "e6bcea3eb010a0885174b9805b58bcd65e274c46a9274064cdeb8b1d36176d1d",
+  "QMRProxy_v12_1_Unified_Quality/unified.py": "f5554a0836d6d0488c51a6489a0b49e29e6bdf5e1dfb5b9538825929ac7dc488",
+  "QMRProxy_v12_1_Unified_Quality/quality.py": "3eefbcce46d702a6a2973faf19acc6d1d24517eba0029b991c6392c18eac5edb",
+  "QMRProxy_v12_1_Unified_Quality/health_lab.py": "9ed2eb0aa9d3f213a42b542dac5a889dde37db5d8de8746928123c4ac8c12cb3",
+  "QMRProxy_v12_1_Unified_Quality/faketls.py": "0edf1723ea29a80d1c1c0d82af6619aae49d90754470f200316c96adc990c0bf",
+  "QMRProxy_Termux_Rebuild/boards.py": "83c8dc3b587696ed9b9a7a0cf12d3881bbc0c69819e77501c8fc58b28bc58063",
+  "QMRProxy_Termux_Rebuild/refresh_extra_v116.py": "aaab184b2dcb56eefc0c210e54c1464789809c17686d1ac68af7ad587f7cf04e",
+  "QMRProxy_Termux_Rebuild/qmr.py": "fe3d1e0f7432904a6a2c5bb2976aa50ff2b267d6c16dce935f07d6bb4c8af653",
+  "QMRProxy_Termux_Rebuild/webhook.py": "ace7ee36544159dc3dd919ae3e123a5aa302192f941e9ce8b0d3ab13b07b4bb1"
+}
