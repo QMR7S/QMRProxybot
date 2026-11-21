@@ -1,6 +1,6 @@
 // Telegram Serverless — QMR Proxy v6. Does not change webhooks itself.
 import {api} from 'sdk';
-import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser,newBroadcast} from '../lib/store.js';
+import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser} from '../lib/store.js';
 import {IS_OWNER,text,home,subscriptionScreen,checkSubscription,sendScreen,
   genericScreen,serversScreen,statusScreen,adminScreen,keyboard} from '../lib/ui.js';
 
