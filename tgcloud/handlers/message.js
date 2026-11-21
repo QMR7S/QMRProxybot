@@ -1,6 +1,6 @@
 // Telegram Serverless — QMR Proxy v6. Does not change webhooks itself.
 import {api} from 'sdk';
-import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser,newBroadcast} from '../lib/store.js';
+import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser} from '../lib/store.js';
 import {IS_OWNER,text,home,subscriptionScreen,checkSubscription,sendScreen,
   genericScreen,serversScreen,statusScreen,adminScreen,keyboard} from '../lib/ui.js';
 
@@ -53,14 +53,9 @@ export default async function(message) {
       catch (_){return sendScreen(chatId,{text:'⚠️ قاعدة البيانات غير مهيأة.'});}
     }
     if (command==='/broadcast') {
-      if (arg.length<5||arg.length>1600) return sendScreen(chatId,{text:'صيغة الإرسال: /broadcast نص بين 5 و1600 حرف\nستظهر معاينة مع زر التأكيد.'});
-      try {
-        const b=await newBroadcast(arg);
-        return sendScreen(chatId,{text:'📢 معاينة إشعار #'+b.id+'\n\n'+arg+'\n\nهل تريد بدء الإرسال؟ (15 مستخدماً كحد أقصى لكل دفعة)',reply_markup:keyboard([
-          [{text:'✅ تأكيد الإرسال',callback_data:'q:a:bcast:'+b.id,style:'success'}],
-          [{text:'❌ إلغاء المسودة',callback_data:'q:a:cancel:'+b.id,style:'danger'}]
-        ])});
-      } catch (_) {return sendScreen(chatId,{text:'⚠️ قاعدة البيانات غير مهيأة. لا يمكن إنشاء إشعار الآن.'});}
+      // SAFETY HOLD: never create or send legacy drafts while v13 migration
+      // remains unvalidated. Other bot functions are unaffected.
+      return sendScreen(chatId,{text:'⛔ الإشعارات الجماعية متوقفة مؤقتًا لحماية المستلمين. لن تُنشأ مسودة جديدة حتى اكتمال ترحيل v13 واختبار قاعدة البيانات.'});
     }
   }
   if (command==='/servers'||command==='/proxy') {

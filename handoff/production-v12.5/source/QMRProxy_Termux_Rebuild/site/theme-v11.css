@@ -1,0 +1,89 @@
+/* QMR Proxy v11 — shared responsive glass design system. No user data or auth. */
+:root{
+ --q-bg:#090d1c;--q-bg2:#10172b;--q-panel:rgba(25,35,65,.72);--q-panel2:rgba(36,42,76,.62);
+ --q-line:rgba(174,194,255,.19);--q-ink:#f3f6ff;--q-muted:#adbad8;
+ --q-violet:#9679f6;--q-blue:#58a2f1;--q-mint:#50dfcb;--q-amber:#ffc681;
+ --q-radius:22px;--q-glow:0 16px 46px rgba(1,6,26,.22);
+ --q-fast:180ms ease;
+}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body.qmr-v11 .shell{width:min(1160px,calc(100% - 36px));margin-inline:auto}
+body.qmr-v11{background:radial-gradient(ellipse 80vw 55vh at 83% 8%,rgba(104,69,194,.17),transparent 76%),radial-gradient(ellipse 80vw 75vh at 0% 65%,rgba(31,117,159,.12),transparent 80%),var(--q-bg);color:var(--q-ink);min-height:100vh}
+body.qmr-v11,body.qmr-v11 button,body.qmr-v11 input,body.qmr-v11 select{font-family:system-ui,-apple-system,"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif}
+body.qmr-v11 *{box-sizing:border-box}
+body.qmr-v11 a{transition:color var(--q-fast),border-color var(--q-fast),background var(--q-fast)}
+body.qmr-v11 button{cursor:pointer;transition:transform var(--q-fast),filter var(--q-fast),border-color var(--q-fast);touch-action:manipulation}
+body.qmr-v11 button:hover:not(:disabled){filter:brightness(1.085)}
+body.qmr-v11 button:active:not(:disabled){transform:scale(.985)}
+body.qmr-v11 :is(a,button,input,select,summary,textarea):focus-visible{outline:3px solid var(--q-mint);outline-offset:3px}
+body.qmr-v11 :is(.proxy,.hero-card,.steps article,.metric,.panel,.proxy-card,.counters,.welcome,.help,.gate,.notice,.site-panel,.q-card,.glass-panel){background:linear-gradient(150deg,rgba(33,39,75,.84),rgba(14,24,49,.73))!important;border:1px solid var(--q-line)!important;box-shadow:var(--q-glow);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+body.qmr-v11 :is(.proxy,.metric,.panel,.proxy-card,.site-panel,.q-card){border-radius:var(--q-radius)!important}
+body.qmr-v11 :is(.btn,.outline,.pill,.chip,.smallbtn,.connect,.copy,.danger-btn,.good-btn){min-height:44px}
+body.qmr-v11 :is(.nav,.bar,.top){border-bottom:1px solid var(--q-line)}
+body.qmr-v11 .brand-logo{width:43px;height:43px;display:inline-block;vertical-align:middle;flex:none;filter:drop-shadow(0 6px 20px rgba(150,121,246,.32))}
+body.qmr-v11 .brand-mark{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--q-ink)}
+body.qmr-v11 .brand-mark strong{display:block;letter-spacing:.01em}
+body.qmr-v11 .brand-mark small{display:block;color:var(--q-muted);font-size:10px;letter-spacing:.06em}
+body.qmr-v11 .q-v11-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 0;border-bottom:1px solid var(--q-line)}
+body.qmr-v11 .q-v11-nav{display:flex;align-items:center;gap:9px;overflow-x:auto;max-width:100%;scrollbar-width:thin;padding:8px 0}
+body.qmr-v11 .q-v11-nav a{flex:none;white-space:nowrap;padding:9px 14px;border-radius:999px;border:1px solid var(--q-line);background:rgba(20,30,57,.65);color:var(--q-muted);font-size:12px;text-decoration:none}
+body.qmr-v11 .q-v11-nav a:hover,body.qmr-v11 .q-v11-nav a[aria-current="page"]{color:white;background:rgba(126,105,228,.22);border-color:rgba(161,143,255,.52)}
+body.qmr-v11 .q-hero{padding:40px 0 26px;max-width:780px}
+body.qmr-v11 .q-eyebrow{font-size:12px;letter-spacing:.15em;color:var(--q-mint);font-weight:800}
+body.qmr-v11 .q-hero h1{font-size:clamp(29px,5vw,52px);line-height:1.35;margin:13px 0}
+body.qmr-v11 .q-hero p{color:var(--q-muted);line-height:2;max-width:650px}
+body.qmr-v11 .q-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0}
+body.qmr-v11 .q-card{display:block;color:var(--q-ink);padding:22px;text-decoration:none}
+body.qmr-v11 .q-card h3{margin:10px 0 6px;font-size:17px}
+body.qmr-v11 .q-card p{font-size:13px;line-height:1.8;margin:0;color:var(--q-muted)}
+body.qmr-v11 .q-card .q-icon{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:14px;background:rgba(130,108,239,.15);color:#b6a0ff;font-size:22px}
+body.qmr-v11 .q-section{margin:32px 0 54px}
+body.qmr-v11 .q-section h2{margin:0 0 16px;font-size:clamp(21px,3vw,30px)}
+body.qmr-v11 .q-prose{color:#c0cbe4;line-height:2;font-size:14px}
+body.qmr-v11 .q-accordion{border:1px solid var(--q-line);background:rgba(18,26,54,.72);border-radius:16px;margin:10px 0;overflow:hidden;backdrop-filter:blur(10px)}
+body.qmr-v11 .q-accordion summary{cursor:pointer;list-style:none;padding:17px 48px 17px 18px;font-size:15px;font-weight:750;position:relative;line-height:1.7}
+body.qmr-v11 .q-accordion summary::-webkit-details-marker{display:none}
+body.qmr-v11 .q-accordion summary::before{content:'+';font-size:24px;position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--q-violet);font-weight:400}
+body.qmr-v11 .q-accordion[open] summary::before{content:'−'}
+body.qmr-v11 .q-accordion[open] summary{background:rgba(100,81,186,.12)}
+body.qmr-v11 .q-accordion :is(p,ol,ul){font-size:13px;line-height:2;padding:0 20px 12px;margin-top:5px;color:#c5d0e8}
+body.qmr-v11 .q-accordion li{margin:5px 12px}
+body.qmr-v11 .q-bullet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+body.qmr-v11 .q-bullet .q-card{min-height:120px}
+body.qmr-v11 .q-contact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+body.qmr-v11 .q-contact .q-card{display:flex;gap:14px;align-items:center;min-height:96px}
+body.qmr-v11 .q-contact .q-card h3{margin:0 0 4px}
+body.qmr-v11 .q-contact .q-card img{width:32px;height:32px}
+body.qmr-v11 .q-contact .q-card.is-pending{opacity:.78;cursor:default}
+body.qmr-v11 .q-social-note{font-size:12px;color:var(--q-amber);margin-top:8px}
+body.qmr-v11 .q-footer{margin-top:40px;padding:30px 0 48px;border-top:1px solid var(--q-line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--q-muted)}
+body.qmr-v11 .q-footer a{color:#c4d8ff;text-decoration:none}
+body.qmr-v11 .q-mini-links{display:flex;gap:14px;flex-wrap:wrap}
+body.qmr-v11 .q-badges{display:flex;gap:8px;flex-wrap:wrap}
+body.qmr-v11 .q-badge{display:inline-flex;align-items:center;border:1px solid rgba(145,173,230,.28);padding:5px 10px;border-radius:999px;background:rgba(33,42,72,.5);color:#c8d7fa;font-size:11px;line-height:1.5}
+body.qmr-v11 .q-badge.mint{color:var(--q-mint);border-color:rgba(66,218,185,.27)}
+body.qmr-v11 .q-legal ol{padding-inline-start:24px}body.qmr-v11 .q-legal li{margin:12px 0}
+body.qmr-v11 .q-legal :is(p,li){font-size:14px;line-height:2;color:#c4cfea}
+body.qmr-v11 .q-section-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+body.qmr-v11 .q-signpost{padding:14px 18px;border-radius:16px;border:1px solid rgba(255,198,129,.30);color:#e6d6b9;background:rgba(121,85,47,.11);font-size:12px;line-height:1.9}
+body.qmr-v11 .q-v11-compact{padding-top:18px}
+body.qmr-v11 :is(.hero,.welcome){background-image:radial-gradient(ellipse 70% 90% at 15% 25%,rgba(132,93,235,.14),transparent 70%)}
+body.qmr-v11 .proxy :is(.proxy-sub,.server),body.qmr-v11 .proxy-card .server-host{color:#c1ceea}
+body.qmr-v11 .proxy .server{background:rgba(6,13,30,.45)}
+body.qmr-v11 .steps article{border-radius:var(--q-radius)!important}
+body.qmr-v11 .source{padding-bottom:30px}
+body.qmr-v11 .toolbar{flex-wrap:wrap}
+body.qmr-v11 .q-quick{margin:16px 0;display:flex;gap:10px;align-items:center;overflow-x:auto}
+body.qmr-v11 .q-quick a{color:#dbe4ff;background:rgba(33,40,78,.68);border:1px solid var(--q-line);padding:10px 13px;text-decoration:none;white-space:nowrap;border-radius:12px;font-size:12px}
+body.qmr-v11 .q-dashboard-callout{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:16px 20px;border:1px solid var(--q-line);background:rgba(10,20,40,.6);border-radius:18px;margin:18px 0}
+body.qmr-v11 .q-dashboard-callout p{margin:5px 0;color:var(--q-muted);font-size:12px;line-height:1.8}
+body.qmr-v11 .q-dashboard-callout strong{font-size:15px}
+body.qmr-v11 .q-dashboard-callout a{color:#d7c5ff;white-space:nowrap}
+body.qmr-v11 .q-dock{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+body.qmr-v11 .q-dock button,body.qmr-v11 .q-dock a{min-width:58px;min-height:44px}
+body.qmr-v11 .q-stat{font-variant-numeric:tabular-nums}
+body.qmr-v11 .q-safe-bottom{padding-bottom:max(90px,calc(env(safe-area-inset-bottom,0px) + 72px))}
+@media(max-width:780px){body.qmr-v11 .q-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){body.qmr-v11 .q-card-grid,body.qmr-v11 .q-bullet,body.qmr-v11 .q-contact{grid-template-columns:1fr}body.qmr-v11 .q-v11-bar{padding:14px 0}body.qmr-v11 .q-hero{padding:28px 0 16px}body.qmr-v11 .q-card{padding:17px}body.qmr-v11 .q-accordion summary{font-size:14px}body.qmr-v11 .q-badge{font-size:10px}body.qmr-v11 .q-dashboard-callout{flex-wrap:wrap}body.qmr-v11 .q-contact .q-card{min-height:82px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@supports not (backdrop-filter:blur(8px)){body.qmr-v11 .q-card,body.qmr-v11 .q-accordion{background:#17203d!important}}

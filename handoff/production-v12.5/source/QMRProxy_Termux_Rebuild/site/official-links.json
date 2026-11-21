@@ -1,0 +1,30 @@
+{
+  "version": "v11-stage1.4",
+  "telegram_channel": {
+    "label": "@QMR7S",
+    "url": "https://t.me/QMR7S",
+    "verified": true
+  },
+  "telegram_contact": {
+    "label": "@ID29i",
+    "url": "https://t.me/ID29i",
+    "verified": true
+  },
+  "telegram_support": {
+    "label": "@QMRSupportbot",
+    "url": "https://t.me/QMRSupportbot",
+    "verified": true
+  },
+  "instagram": {
+    "label": "@QMR7S",
+    "url": "https://www.instagram.com/qmr7s/",
+    "verified": true,
+    "verification_note": "Public profile indexed under the supplied handle."
+  },
+  "youtube": {
+    "label": "QMR7S",
+    "url": "https://www.youtube.com/@QMR7S",
+    "verified": false,
+    "verification_note": "URL follows the handle supplied by the owner; channel identity was not independently confirmed."
+  }
+}

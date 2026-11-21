@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0A1020"><meta name="description" content="QMR Proxy by QMR7S — دليل بروكسيات MTProto المجتمعية وإدارة روابطك محلياً.">
+<title>QMR Proxy | QMR7S</title><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./theme-v11.css"><link rel="stylesheet" href="./refine-v11.css"><link rel="stylesheet" href="./studio-v11.css"><link rel="stylesheet" href="./extra-v11.css">
+<link rel="stylesheet" href="./quality-v119.css?v=123">
+</head><body class="qmr-v11 qmr-studio q-public"><div class="aura"></div><div class="shell">
+<header class="nav studio-header">
+ <div class="brand studio-brand"><img src="./icon.svg" width="46" height="46" alt="شعار QMR Proxy"><div><strong>QMR <span>PROXY</span></strong><small>BY QMR7S · MTProto EXPLORER</small></div></div>
+ <div class="studio-header-actions"><a href="./mini/" class="studio-app-link">التطبيق المصغّر <svg class="ico" aria-hidden="true"><use href="./assets/ui-icons.svg#arrow"></use></svg></a><button type="button" class="studio-install" id="install" aria-label="تثبيت الموقع">تثبيت</button></div>
+</header>
+<main>
+ <section class="hero studio-hero" id="home">
+  <div class="studio-hero-main"><div class="eyebrow"><span class="pulse"></span> QMR7S / TELEGRAM CONNECTION</div>
+  <h1>بروكسيات تيليجرام.<br><em>بساطة في كل خطوة.</em></h1>
+  <p>اكتشف روابط MTProto المجتمعية، راجع تفاصيلها واحفظ اختياراتك على جهازك. كل شيء واضح دون وعود غير مؤكدة.</p>
+  <div class="heroactions"><a class="btn main" href="#servers"><svg class="ico" aria-hidden="true"><use href="./assets/ui-icons.svg#server"></use></svg>استعراض الروابط</a><button type="button" class="btn muted" data-qmr-tool="extract"><svg class="ico" aria-hidden="true"><use href="./assets/ui-icons.svg#scan"></use></svg>استخراج رابط</button></div>
+  <div class="studio-hero-trust"><span>◈ لا نطلب رمز الدخول أبدًا</span><span>◈ الروابط من مشغّلين مستقلين</span></div>
+  </div>
+  <aside class="studio-overview glass-surface" aria-label="ملخص البروكسيات">
+   <div class="studio-overview-top"><span class="glass-chip"><span class="pulse"></span> QMR DIRECTORY</span><span class="studio-overview-icon"><svg class="ico"><use href="./assets/ui-icons.svg#server"></use></svg></span></div>
+   <div class="studio-big-number" id="stat-total">—</div><div class="studio-label">رابط MTProto مدرج</div>
+   <div class="studio-overview-state"><span id="status-source">جاري تحميل المصدر…</span></div>
+   <div class="studio-stat-pair"><div><strong id="stat-saved">0</strong><small>بالمفضلة</small></div><div><strong>محلي</strong><small>حفظ اختياراتك</small></div></div>
+   <small class="studio-overview-note">العدد لا يثبت أن الاتصالات متاحة الآن</small>
+  </aside>
+ </section>
+ <section class="studio-actions-section" aria-label="أدوات سريعة" id="tools">
+  <div class="studio-section-label">QUICK ACTIONS</div><div class="studio-quick-grid">
+   <button type="button" data-qmr-tool="add" class="studio-action-tile"><span class="studio-tile-icon"><svg class="ico"><use href="./assets/ui-icons.svg#plus"></use></svg></span><span><b>إضافة بروكسي</b><small>من رابط أو بيانات يدوية</small></span><svg class="ico studio-tile-end"><use href="./assets/ui-icons.svg#arrow"></use></svg></button>
+   <button type="button" data-qmr-tool="extract" class="studio-action-tile"><span class="studio-tile-icon"><svg class="ico"><use href="./assets/ui-icons.svg#scan"></use></svg></span><span><b>استخراج البيانات</b><small>الخادم، المنفذ والـSecret</small></span><svg class="ico studio-tile-end"><use href="./assets/ui-icons.svg#arrow"></use></svg></button>
+   <button type="button" data-qmr-tool="check" class="studio-action-tile"><span class="studio-tile-icon"><svg class="ico"><use href="./assets/ui-icons.svg#check"></use></svg></span><span><b>فحص الصيغة</b><small>تحقق محلي دون اتصال بالخادم</small></span><svg class="ico studio-tile-end"><use href="./assets/ui-icons.svg#arrow"></use></svg></button>
+  </div>
+ </section>
+ <section id="servers" class="content studio-list-section">
+   <div class="sectionhead studio-sectionhead"><div><div class="eyebrow">EXPLORE PROXIES</div><h2>دليل البروكسيات</h2><p>اختر حسب المصدر، واحفظ روابطك المفضلة. لا نعرض «متصل الآن» دون فحص حقيقي.</p></div><button id="refresh" type="button" class="outline studio-refresh"><svg class="ico"><use href="./assets/ui-icons.svg#refresh"></use></svg> تحديث المصدر</button></div>
+   <div class="studio-filter-panel glass-surface"><label class="studio-search"><svg class="ico" aria-hidden="true"><use href="./assets/ui-icons.svg#search"></use></svg><input type="search" id="search" autocomplete="off" placeholder="ابحث عن الخادم أو الاسم…" aria-label="بحث البروكسيات"></label><div class="studio-filter-actions"><label class="studio-select-label">عرض <select id="filter" aria-label="تصفية النتائج"><option value="all">جميع الروابط</option><option value="extra">المجموعة الإضافية</option><option value="saved">المفضلة</option><option value="custom">إضافاتي</option><option value="adfree">خالية من الإعلانات (مؤكدة فقط)</option></select></label><button id="add" type="button" class="studio-add-button"><svg class="ico"><use href="./assets/ui-icons.svg#plus"></use></svg>إضافة بروكسي</button></div></div>
+   <div class="q-extra-note" id="extras"><strong>مصدر إضافي مستقل</strong> · قوائم MTProto مجتمعية من 0xRadikal. زمن الاستجابة ونسبة نجاح الفحوص بيانات تاريخية وفق المصدر، وليست اختبارًا على جهازك. الحماية والخصوصية وتوفر الرابط على المدى الطويل غير مضمونة. <a href="https://github.com/0xRadikal/Free-Telegram-Proxy" target="_blank" rel="noopener noreferrer">تفاصيل المصدر</a><div class="q-extra-stats"><span id="q-extra-count">— رابط إضافي</span><span id="q-extra-date">تاريخ المصدر غير متاح</span></div></div>
+   <div class="studio-result-bar"><span id="counter">جاري التحميل…</span><span>حالة الاتصال والإعلانات غير مؤكدة ما لم يُذكر غير ذلك</span></div>
+   <div id="list" class="cards studio-proxy-grid" aria-live="polite"></div><p class="empty" id="empty" hidden>لا توجد نتائج مطابقة. جرّب بحثًا أو تصفية أخرى.</p><button id="q-more" type="button" class="q-load-more" hidden>عرض 12 رابطًا إضافيًا</button>
+   <div id="source" class="source studio-source-note">قراءة مصدر القائمة…</div>
+   <div class="studio-backup-row"><button id="export" type="button" class="outline"><svg class="ico"><use href="./assets/ui-icons.svg#download"></use></svg>نسخة احتياطية</button><label class="upload outline" for="import"><svg class="ico"><use href="./assets/ui-icons.svg#upload"></use></svg>استيراد روابطك</label><input type="file" id="import" accept="application/json,.json" hidden></div>
+   <details class="connect-help studio-accordion"><summary>ماذا أفعل إذا لم يفتح الرابط داخل Telegram؟</summary><p>جرّب نسخ الرابط وإرساله إلى الرسائل المحفوظة داخل Telegram ثم افتحه هناك. فشل الاتصال بعد إضافة البروكسي قد يدل على توقف الخادم أو حجبه في شبكتك.</p></details>
+ </section>
+ <section class="studio-guide glass-surface" id="guide"><div class="studio-guide-head"><div><div class="eyebrow">SAFE & SIMPLE</div><h2>ابدأ بثلاث خطوات</h2></div><a href="./guide/" class="studio-inline-link">الدليل الكامل <svg class="ico"><use href="./assets/ui-icons.svg#arrow"></use></svg></a></div><div class="studio-steps"><article><span>01</span><b>اختر رابطًا</b><p>اطّلع على المصدر والتحذيرات قبل الضغط على الاتصال.</p></article><article><span>02</span><b>أضفه في Telegram</b><p>راجع شاشة إضافة MTProto ولا تمنح صلاحيات إضافية.</p></article><article><span>03</span><b>احتفظ ببديل</b><p>احفظ رابطًا آخر، وفعّل حماية حسابك بخطوتين.</p></article></div></section>
+ <section class="studio-resources"><div class="studio-section-label">HELP CENTER</div><div class="studio-sectionhead"><div><h2>معلومات مهمة وواضحة</h2><p>الخصوصية والشروط والدعم ليست تفاصيل ثانوية.</p></div></div><div class="studio-resource-grid">
+  <a href="./faq/" class="studio-resource"><span><svg class="ico"><use href="./assets/ui-icons.svg#help"></use></svg></span><b>الأسئلة الشائعة</b><small>أجوبة مختصرة ومنسدلة</small></a>
+  <a href="./safety/" class="studio-resource"><span><svg class="ico"><use href="./assets/ui-icons.svg#shield"></use></svg></span><b>الأمان</b><small>مخاطر وأفضل ممارسات</small></a>
+  <a href="./privacy/" class="studio-resource"><span><svg class="ico"><use href="./assets/ui-icons.svg#lock"></use></svg></span><b>الخصوصية</b><small>كيف تُحفظ بياناتك</small></a>
+  <a href="./contact/" class="studio-resource"><span><svg class="ico"><use href="./assets/ui-icons.svg#support"></use></svg></span><b>التواصل</b><small>القناة والدعم الرسمي</small></a>
+ </div></section>
+</main>
+<footer class="studio-footer"><div><img src="./icon.svg" alt="" width="32" height="32"><span><b>QMR PROXY</b><small>by QMR7S · MTProto Directory</small></span></div><p>دليل روابط مجتمعية مستقلة، وليس شبكة VPN أو مزوّد خوادم. الخصوصية والتوفّر لا يمكن ضمانهما.</p><nav aria-label="روابط قانونية"><a href="./terms/">الشروط</a><a href="./privacy/">الخصوصية</a><a href="https://t.me/QMR7S">قناة QMR7S</a><a href="https://t.me/QMRSupportbot">الدعم</a></nav></footer>
+</div>
+<dialog hidden id="editor"><form id="proxy-form" method="dialog"><label>الخادم<input id="server"></label><label>المنفذ<input id="port" type="number"></label><label>Secret<input id="secret"></label><p id="form-error"></p><button id="save-proxy" value="save">حفظ</button></form></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><div id="telegram-mode" hidden></div>
+<script defer src="./quality-v119.js?v=123"></script>
+<script src="https://telegram.org/js/telegram-web-app.js" defer></script><script src="./proxy-tools-core.js" defer></script><script src="./navigation-v11.js" defer></script><script src="./proxy-tools-ui.js" defer></script><script src="./app.js?v=123" defer></script>
+</body></html>

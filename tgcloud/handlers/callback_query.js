@@ -1,6 +1,7 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
 import {api} from 'sdk';
-import {isBlocked,getSetting,setSetting,getStats,broadcastById,broadcastBatch,cancelBroadcast} from '../lib/store.js';
+import {ownerCallbackAllowed} from '../lib/owner_callback_guard.js';
+import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from '../lib/store.js';
 import {IS_OWNER,text,home,checkSubscription,subscriptionScreen,
   sendScreen,genericScreen,serversScreen,statusScreen,adminScreen,
   broadcastIntro,keyboard} from '../lib/ui.js';
@@ -33,7 +34,10 @@ export default async function(query) {
     return ack(query,'زر غير مدعوم');
   }
   const owner=IS_OWNER(uid);
-  if (ownerOnly(data) && !owner) return ack(query,'غير مخوّل بهذه العملية');
+  // Owner controls, including q:admin, must run only inside the owner's
+  // private bot chat. Reject group/supergroup callbacks even from the owner.
+  // This prevents admin state and message previews leaking into group chats.
+  if (ownerOnly(data) && !ownerCallbackAllowed(query, IS_OWNER)) return ack(query,'غير مخوّل بهذه العملية');
   if (!owner) {
     try {if(await isBlocked(uid)) {await ack(query);return sendScreen(chatId,{text:text.blocked},messageId);}}
     catch (_) { /* migration not yet applied */ }
@@ -92,13 +96,13 @@ export default async function(query) {
     }catch(_){return sendScreen(chatId,{text:'تعذر إلغاء المسودة.'},messageId);}
   }
   if (data.startsWith('q:a:bcast:')) {
-    const id=Number(data.split(':')[3]);
-    if (!Number.isSafeInteger(id)||id<=0) return;
-    try {
-      const b=await broadcastById(id);
-      if (!b || !['draft','sending'].includes(b.status)) return sendScreen(chatId,{text:'هذه المسودة غير موجودة أو انتهت بالفعل.'},messageId);
-      const result=await broadcastBatch(id,api);
-      return sendScreen(chatId,{text:'📢 الإشعار #'+id+'\n\n✅ أُرسل: '+result.sent+'\n⚠️ تعذر التسليم: '+result.failed+'\n'+(result.done?'🏁 انتهى الإرسال.':'➡️ توجد دفعات متبقية، اضغط متابعة لإرسال 15 أخرى.'),reply_markup:broadcastButtons(id,!result.done)},messageId);
-    }catch(_){return sendScreen(chatId,{text:'⚠️ تعذّر الإرسال؛ قد تكون قاعدة البيانات غير مهيأة. راجع لوحة المالك.'},messageId);}
+    // SAFETY HOLD (review branch): legacy v6 cursor-first dispatcher can
+    // permanently skip users or overlap with another callback invocation.
+    // Do not send or mutate the old campaign until v13 native handler migration,
+    // private snapshot validation and cloud-stage dry run have passed.
+    return sendScreen(chatId,{
+      text:'⛔ إرسال الإشعارات متوقف مؤقتًا لحماية البيانات ومنع تكرار الإرسال أو فقدان المستلمين. لا تغيّر المسودة؛ يلزم إكمال الترحيل الآمن.',
+      reply_markup:keyboard([[{text:'⚙️ لوحة المالك',callback_data:'q:admin'}]])
+    },messageId);
   }
 }

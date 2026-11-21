@@ -1,0 +1,90 @@
+name: Broadcast dispatcher isolated tests (review only)
+on:
+  push:
+    branches:
+      - review/qmr-v12-5-production-baseline
+    paths:
+      - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tgcloud/lib/owner_callback_guard.js'
+      - 'tgcloud/handlers/callback_query.js'
+      - 'tools/owner_callback_guard.test.mjs'
+      - 'tools/audit_broadcast_safety.mjs'
+      - 'tgcloud/handlers/message.js'
+      - 'tools/legacy_broadcast_hold.test.mjs'
+      - 'tools/broadcast_dispatcher_reference.test.mjs'
+      - 'tools/broadcast_v13_review_schema.sql'
+      - 'tools/test_broadcast_v13_sqlite.py'
+      - 'tools/broadcast_v13_snapshot_staging.py'
+      - 'tools/test_broadcast_v13_snapshot_staging.py'
+      - 'tools/tgcloud_broadcast_adapter_v13.mjs'
+      - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_bridge_v13.mjs'
+      - 'tools/tgcloud_broadcast_bridge_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_real_sqlite.test.mjs'
+      - 'tools/native_broadcast_v13_real_sqlite.test.mjs'
+      - 'tgcloud/lib/broadcast_v13_storage.js'
+      - 'tgcloud/lib/broadcast_v13_dispatch.js'
+      - 'tools/broadcast_v13_sdk_schema_candidate.mjs'
+      - '.github/workflows/broadcast-reference.yml'
+  pull_request:
+    paths:
+      - 'tools/broadcast_dispatcher_reference.mjs'
+      - 'tgcloud/lib/owner_callback_guard.js'
+      - 'tgcloud/handlers/callback_query.js'
+      - 'tools/owner_callback_guard.test.mjs'
+      - 'tools/audit_broadcast_safety.mjs'
+      - 'tgcloud/handlers/message.js'
+      - 'tools/legacy_broadcast_hold.test.mjs'
+      - 'tools/broadcast_dispatcher_reference.test.mjs'
+      - 'tools/broadcast_v13_review_schema.sql'
+      - 'tools/test_broadcast_v13_sqlite.py'
+      - 'tools/broadcast_v13_snapshot_staging.py'
+      - 'tools/test_broadcast_v13_snapshot_staging.py'
+      - 'tools/tgcloud_broadcast_adapter_v13.mjs'
+      - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_bridge_v13.mjs'
+      - 'tools/tgcloud_broadcast_bridge_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_real_sqlite.test.mjs'
+      - 'tools/native_broadcast_v13_real_sqlite.test.mjs'
+      - 'tgcloud/lib/broadcast_v13_storage.js'
+      - 'tgcloud/lib/broadcast_v13_dispatch.js'
+      - 'tools/broadcast_v13_sdk_schema_candidate.mjs'
+      - '.github/workflows/broadcast-reference.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and isolated dispatcher assertions
+        run: |
+          node --check tools/broadcast_dispatcher_reference.mjs
+          node --check tools/broadcast_dispatcher_reference.test.mjs
+          node --test tools/broadcast_dispatcher_reference.test.mjs
+          node --check tools/tgcloud_broadcast_adapter_v13.mjs
+          node --check tools/tgcloud_broadcast_adapter_v13.test.mjs
+          node --test tools/tgcloud_broadcast_adapter_v13.test.mjs
+          node --check tools/tgcloud_broadcast_bridge_v13.mjs
+          node --check tools/tgcloud_broadcast_bridge_v13.test.mjs
+          node --test tools/tgcloud_broadcast_bridge_v13.test.mjs
+          node --check tools/tgcloud_broadcast_real_sqlite.test.mjs
+          node --test tools/tgcloud_broadcast_real_sqlite.test.mjs
+          node --check tgcloud/lib/broadcast_v13_storage.js
+          node --check tgcloud/lib/broadcast_v13_dispatch.js
+          node --test tools/native_broadcast_v13_real_sqlite.test.mjs
+          node --check tgcloud/lib/owner_callback_guard.js
+          node --check tgcloud/handlers/callback_query.js
+          node --test tools/owner_callback_guard.test.mjs
+          node --check tgcloud/handlers/message.js
+          node --test tools/legacy_broadcast_hold.test.mjs
+          node --check tools/broadcast_v13_sdk_schema_candidate.mjs
+      - name: SQLite lease and delivery journal assertions
+        run: |
+          python3 tools/test_broadcast_v13_sqlite.py -v
+          python3 -m py_compile tools/broadcast_v13_snapshot_staging.py tools/test_broadcast_v13_snapshot_staging.py
+          python3 tools/test_broadcast_v13_snapshot_staging.py -v
