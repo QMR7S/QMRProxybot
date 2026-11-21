@@ -78,6 +78,14 @@ export function makeBroadcastV13Adapter(db) {
   }
   return {
     claim, nextPending, release,
+    async isBlocked(userId) {
+      if (!positive(userId)) throw Error('invalid recipient');
+      // Existing v6 user table. Missing schema must fail closed, never bypass blocks.
+      const user = await db.get(
+        'SELECT blocked FROM qmr_users_v6 WHERE user_id=:uid',
+        { ':uid':userId });
+      return Number(user?.blocked ?? 0) === 1;
+    },
     markAttempt: (id,uid,token,fence,now) =>
       transition(id,uid,'pending','attempting',token,fence,now),
     markSent: (id,uid,token,fence,now) =>
