@@ -12,14 +12,14 @@ export function createV13DispatchBridge(storage, sendMessage, now = () => Date.n
     const startedAt = now();
     const lease = await storage.claim(id,token,startedAt,leaseMs);
     if (!lease) return {status:'busy',sent:0,uncertain:0,blocked:0};
-    let sent=0,uncertain=0,blocked=0,stopped='complete';
+    let sent=0,uncertain=0,blocked=0,stopped='batch-limit';
     const deadline=startedAt+leaseMs;
     try {
       for (let i=0; i<limit; i++) {
         // Refuse to begin an external send when insufficient lease time remains.
         if (now() >= deadline-minRemainingMs) {stopped='lease-near-expiry';break;}
         const recipient=await storage.nextPending(id,token,lease.fence,now());
-        if (!recipient) break;
+        if (!recipient) {stopped='queue-drained';break;}
         if (!positive(recipient.userId)) throw Error('invalid recipient');
         if (await storage.isBlocked(recipient.userId)) {
           await storage.markBlocked(id,recipient.userId,token,lease.fence,now());blocked++;
