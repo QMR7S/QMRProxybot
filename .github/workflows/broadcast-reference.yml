@@ -60,4 +60,5 @@ jobs:
       - name: SQLite lease and delivery journal assertions
         run: |
           python3 tools/test_broadcast_v13_sqlite.py -v
+          python3 -m py_compile tools/broadcast_v13_snapshot_staging.py tools/test_broadcast_v13_snapshot_staging.py
           python3 tools/test_broadcast_v13_snapshot_staging.py -v
