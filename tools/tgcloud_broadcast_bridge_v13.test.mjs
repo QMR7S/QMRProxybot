@@ -75,3 +75,30 @@ test('oversized batches and invalid tokens fail closed',async()=>{
   await assert.rejects(d.dispatch(1,'abc'),/invalid dispatch/);
   await assert.rejects(d.dispatch(1,TOKEN,{limit:16}),/invalid dispatch/);
 });
+
+test('429 retry_after seconds becomes absolute millisecond deadline',async()=>{
+  const s=storage([101,102]);
+  let deadline;
+  const mark=s.markUnknown.bind(s);
+  s.markUnknown=async(...args)=>{deadline=args[5];return mark(...args);};
+  const fixedTime=1700000000000;
+  const result=await createV13DispatchBridge(s,async()=>{
+    throw {code:429,parameters:{retry_after:19}};
+  },()=>fixedTime).dispatch(1,TOKEN);
+  assert.equal(result.status,'rate-limited');
+  assert.equal(deadline,fixedTime+19000);
+  assert.equal(s.states.get(102),'pending');
+});
+test('429 with invalid retry_after stops further sends conservatively',async()=>{
+  const s=storage([101,102]);
+  let deadline,calls=0;
+  const mark=s.markUnknown.bind(s);
+  s.markUnknown=async(...args)=>{deadline=args[5];return mark(...args);};
+  const fixedTime=1700000000000;
+  const result=await createV13DispatchBridge(s,async()=>{
+    calls++;throw {error_code:429,parameters:{retry_after:'invalid'}};
+  },()=>fixedTime).dispatch(1,TOKEN);
+  assert.equal(result.status,'rate-limited');
+  assert.equal(deadline,fixedTime+86400000);
+  assert.equal(calls,1);
+});
