@@ -143,3 +143,62 @@ test('cancellation cannot be reversed by finalization',async()=>{
     assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'cancelled');
   } finally {raw.close();}
 });
+
+test('operator summary reports stalled attempts without exposing recipients',async()=>{
+  const {raw,adapter}=fixture([101,102,103]);
+  try {
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='attempting',attempted_ms=1000 WHERE user_id=101");
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='unknown' WHERE user_id=102");
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='blocked' WHERE user_id=103");
+    const summary=await adapter.reconciliationSummary(1,100000,60000);
+    assert.equal(summary.activeLease,false);
+    assert.equal(summary.counts.total,3);
+    assert.equal(summary.counts.agedAttempts,1);
+    assert.equal(summary.counts.unknown,1);
+    assert.equal(summary.needsManualReconciliation,true);
+    assert.equal(summary.finalizable,false);
+    assert.ok(!JSON.stringify(summary).includes('101'));
+    assert.ok(!JSON.stringify(summary).includes('102'));
+    assert.equal(state(raw,101),'attempting');
+  } finally {raw.close();}
+});
+test('active lease prevents reporting an in-flight attempt as orphaned',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    const lease=await adapter.claim(1,TOKEN_A,10000,300000);
+    await adapter.markAttempt(1,101,TOKEN_A,lease.fence,10001);
+    const summary=await adapter.reconciliationSummary(1,100000,60000);
+    assert.equal(summary.activeLease,true);
+    assert.equal(summary.counts.agedAttempts,1);
+    assert.equal(summary.needsManualReconciliation,false);
+    assert.equal(summary.finalizable,false);
+  } finally {raw.close();}
+});
+test('summary suggests completion only for settled, unlocked campaigns',async()=>{
+  const {raw,adapter}=fixture([101,103]);
+  try {
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='sent' WHERE user_id=101");
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='blocked' WHERE user_id=103");
+    const summary=await adapter.reconciliationSummary(1,100000);
+    assert.equal(summary.finalizable,true);
+    assert.equal(summary.needsManualReconciliation,false);
+    assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'sending');
+  } finally {raw.close();}
+});
+test('summary is read-only and never requeues an uncertain delivery',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='unknown' WHERE user_id=101");
+    const before=raw.prepare('SELECT state,attempts FROM qmr_broadcast_delivery_v13').get();
+    const result=await adapter.reconciliationSummary(1,100000);
+    assert.equal(result.counts.unknown,1);
+    assert.deepEqual(raw.prepare('SELECT state,attempts FROM qmr_broadcast_delivery_v13').get(),before);
+  } finally {raw.close();}
+});
+test('invalid reconciliation window is rejected',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    await assert.rejects(adapter.reconciliationSummary(1,10000,10),/invalid reconciliation/);
+    await assert.rejects(adapter.reconciliationSummary(1,-1),/invalid reconciliation/);
+  } finally {raw.close();}
+});
