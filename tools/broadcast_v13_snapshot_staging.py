@@ -10,12 +10,10 @@ class SnapshotRejected(RuntimeError):
     pass
 
 def prepare_recipient_snapshot(conn: sqlite3.Connection, broadcast_id: int,
-                               expected_eligible: int | None = None) -> dict:
+                               expected_eligible: int) -> dict:
     if not isinstance(broadcast_id, int) or isinstance(broadcast_id, bool) or broadcast_id <= 0:
         raise ValueError("invalid broadcast id")
-    if expected_eligible is not None and (
-        not isinstance(expected_eligible, int) or isinstance(expected_eligible, bool)
-        or expected_eligible <= 0):
+    if not isinstance(expected_eligible, int) or isinstance(expected_eligible, bool) or expected_eligible <= 0:
         raise ValueError("invalid expected count")
     if conn.in_transaction:
         raise SnapshotRejected("caller transaction already active")
@@ -43,7 +41,7 @@ def prepare_recipient_snapshot(conn: sqlite3.Connection, broadcast_id: int,
         eligible = conn.execute(
             "SELECT COUNT(*) FROM qmr_users_v6 WHERE blocked=0 AND user_id>0"
         ).fetchone()[0]
-        if not eligible or (expected_eligible is not None and eligible != expected_eligible):
+        if eligible != expected_eligible:
             raise SnapshotRejected("empty or mismatched eligible recipient count")
         conn.execute(
             """INSERT INTO qmr_broadcast_delivery_v13 (broadcast_id,user_id,state)
