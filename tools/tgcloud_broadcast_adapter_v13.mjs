@@ -98,6 +98,27 @@ export function makeBroadcastV13Adapter(db) {
       transition(id,uid,'attempting','unknown',token,fence,now,{retryAfter}),
     markBlocked: (id,uid,token,fence,now) =>
       transition(id,uid,'pending','blocked',token,fence,now),
+    // Completion is only possible when *every* snapshotted recipient has
+    // an explicitly settled state; unknown/attempting/pending block completion.
+    // Atomic WHERE prevents racing a current live owner or a newly pending row.
+    async finalize(id, now) {
+      validJob(id);
+      if (!Number.isSafeInteger(now) || now < 0) throw Error('invalid timestamp');
+      const row = await db.get(
+        `UPDATE qmr_broadcast_jobs_v13
+         SET state='done'
+         WHERE id=:id AND state='sending'
+           AND (owner_token IS NULL OR lease_until_ms<=:now)
+           AND NOT EXISTS (
+             SELECT 1 FROM qmr_broadcast_delivery_v13
+             WHERE broadcast_id=:id
+               AND state IN ('pending','attempting','unknown'))
+           AND EXISTS (
+             SELECT 1 FROM qmr_broadcast_delivery_v13 WHERE broadcast_id=:id)
+         RETURNING id`,
+        { ':id':id, ':now':now });
+      return !!row;
+    },
     // Read-only aggregate for admin/manual reconciliation; never expose content.
     async counts(id) {
       validJob(id);
