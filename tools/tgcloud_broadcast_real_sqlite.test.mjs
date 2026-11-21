@@ -100,3 +100,46 @@ test('actual SQLite preserves rest of queue when first Telegram send fails',asyn
     assert.equal(state(raw,102),'pending');
   } finally {raw.close();}
 });
+
+test('cannot finalize empty broadcast or a broadcast with pending recipients',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    assert.equal(await adapter.finalize(1,1000),false);
+    raw.exec('DELETE FROM qmr_broadcast_delivery_v13');
+    assert.equal(await adapter.finalize(1,1000),false);
+    assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'sending');
+  } finally {raw.close();}
+});
+test('cannot finalize unknown recipient after ambiguous Telegram outcome',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    await createV13DispatchBridge(adapter,async()=>{throw Error('timeout');}).dispatch(1,TOKEN_A);
+    assert.equal(state(raw,101),'unknown');
+    assert.equal(await adapter.finalize(1,Date.now()),false);
+    assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'sending');
+  } finally {raw.close();}
+});
+test('finalize succeeds only after all recipients are settled and lease is released',async()=>{
+  const {raw,adapter}=fixture([101,102,103]);
+  try {
+    const lease=await adapter.claim(1,TOKEN_A,1000,1000);
+    assert.equal(await adapter.finalize(1,1001),false);
+    await adapter.release(1,TOKEN_A,lease.fence);
+    const d=createV13DispatchBridge(adapter,async()=>{});
+    const result=await d.dispatch(1,TOKEN_B);
+    assert.equal(result.sent,2);
+    assert.equal(result.blocked,1);
+    assert.equal(await adapter.finalize(1,Date.now()),true);
+    assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'done');
+    assert.equal(await adapter.claim(1,TOKEN_A,Date.now(),1000),null);
+  } finally {raw.close();}
+});
+test('cancellation cannot be reversed by finalization',async()=>{
+  const {raw,adapter}=fixture([101]);
+  try {
+    raw.exec("UPDATE qmr_broadcast_jobs_v13 SET state='cancelled'");
+    raw.exec("UPDATE qmr_broadcast_delivery_v13 SET state='blocked'");
+    assert.equal(await adapter.finalize(1,1000),false);
+    assert.equal(raw.prepare('SELECT state FROM qmr_broadcast_jobs_v13').get().state,'cancelled');
+  } finally {raw.close();}
+});
