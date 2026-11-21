@@ -32,7 +32,15 @@ export function createV13DispatchBridge(storage, sendMessage, now = () => Date.n
           await sendMessage(recipient.userId,lease.content);
           delivered=true;
         } catch(error) {
-          retryAfter=error?.parameters?.retry_after ?? null;
+          const seconds = error?.parameters?.retry_after;
+          // Bot API retry_after is in SECONDS; journal retry_after_ms is
+          // an absolute Unix millisecond deadline, not a number of seconds.
+          if (Number.isSafeInteger(seconds) && seconds > 0 && seconds <= 86400) {
+            retryAfter = now() + seconds * 1000;
+          } else if (error?.code === 429 || error?.error_code === 429) {
+            // 429 without a usable retry deadline: stop the entire batch.
+            retryAfter = now() + 86400 * 1000;
+          }
         }
         // If the lease expired mid-request, a stale worker cannot record success.
         // The persisted 'attempting' row stays for manual reconciliation.
