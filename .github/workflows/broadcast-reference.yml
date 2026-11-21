@@ -12,6 +12,7 @@ on:
       - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_real_sqlite.test.mjs'
       - '.github/workflows/broadcast-reference.yml'
   pull_request:
     paths:
@@ -23,6 +24,7 @@ on:
       - 'tools/tgcloud_broadcast_adapter_v13.test.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.mjs'
       - 'tools/tgcloud_broadcast_bridge_v13.test.mjs'
+      - 'tools/tgcloud_broadcast_real_sqlite.test.mjs'
       - '.github/workflows/broadcast-reference.yml'
 permissions:
   contents: read
@@ -46,5 +48,7 @@ jobs:
           node --check tools/tgcloud_broadcast_bridge_v13.mjs
           node --check tools/tgcloud_broadcast_bridge_v13.test.mjs
           node --test tools/tgcloud_broadcast_bridge_v13.test.mjs
+          node --check tools/tgcloud_broadcast_real_sqlite.test.mjs
+          node --test tools/tgcloud_broadcast_real_sqlite.test.mjs
       - name: SQLite lease and delivery journal assertions
         run: python3 tools/test_broadcast_v13_sqlite.py -v
