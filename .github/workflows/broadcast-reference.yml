@@ -13,6 +13,8 @@ on:
     paths:
       - 'tools/broadcast_dispatcher_reference.mjs'
       - 'tools/broadcast_dispatcher_reference.test.mjs'
+      - 'tools/broadcast_v13_review_schema.sql'
+      - 'tools/test_broadcast_v13_sqlite.py'
       - '.github/workflows/broadcast-reference.yml'
 permissions:
   contents: read
