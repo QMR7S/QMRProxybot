@@ -102,3 +102,15 @@ test('429 with invalid retry_after stops further sends conservatively',async()=>
   assert.equal(deadline,fixedTime+86400000);
   assert.equal(calls,1);
 });
+
+test('ordinary Telegram failure stops batch without marking other recipients unknown',async()=>{
+  const s=storage([101,102,104]);let calls=0;
+  const d=createV13DispatchBridge(s,async()=>{calls++;throw Error('connection lost');});
+  const first=await d.dispatch(1,TOKEN);
+  assert.equal(first.status,'send-error');
+  assert.equal(first.uncertain,1);
+  assert.equal(calls,1);
+  assert.equal(s.states.get(101),'unknown');
+  assert.equal(s.states.get(102),'pending');
+  assert.equal(s.states.get(104),'pending');
+});
