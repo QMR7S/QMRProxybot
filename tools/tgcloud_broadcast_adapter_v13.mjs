@@ -119,6 +119,47 @@ export function makeBroadcastV13Adapter(db) {
         { ':id':id, ':now':now });
       return !!row;
     },
+    // Read-only operator summary. No content or recipient identifiers returned.
+    // attempted_ms is captured when an attempt begins; age thresholds are
+    // deliberately explicit and do not mutate ambiguous 'attempting' records.
+    async reconciliationSummary(id, now, staleAfterMs = 60000) {
+      validJob(id);
+      if (!Number.isSafeInteger(now) || now < 0 ||
+          !Number.isSafeInteger(staleAfterMs) || staleAfterMs < 30000 ||
+          staleAfterMs > 604800000) throw Error('invalid reconciliation window');
+      const job = await db.get(
+        `SELECT state,owner_token,lease_until_ms
+         FROM qmr_broadcast_jobs_v13 WHERE id=:id`, {':id':id});
+      if (!job) return null;
+      const totals = await db.get(
+        `SELECT COUNT(*) AS total,
+           COALESCE(SUM(CASE WHEN state='pending' THEN 1 ELSE 0 END),0) AS pending,
+           COALESCE(SUM(CASE WHEN state='attempting' THEN 1 ELSE 0 END),0) AS attempting,
+           COALESCE(SUM(CASE WHEN state='unknown' THEN 1 ELSE 0 END),0) AS unknown,
+           COALESCE(SUM(CASE WHEN state='sent' THEN 1 ELSE 0 END),0) AS sent,
+           COALESCE(SUM(CASE WHEN state='blocked' THEN 1 ELSE 0 END),0) AS blocked,
+           COALESCE(SUM(CASE WHEN state='attempting' AND
+             (attempted_ms IS NULL OR attempted_ms<=:cutoff)
+             THEN 1 ELSE 0 END),0) AS agedAttempts
+         FROM qmr_broadcast_delivery_v13 WHERE broadcast_id=:id`,
+         {':id':id, ':cutoff':now-staleAfterMs});
+      const activeLease = job.owner_token !== null && Number(job.lease_until_ms)>now;
+      const unsettled = Number(totals.pending)+Number(totals.attempting)+Number(totals.unknown);
+      return {
+        state:job.state,
+        activeLease,
+        counts:{
+          total:Number(totals.total), pending:Number(totals.pending),
+          attempting:Number(totals.attempting), unknown:Number(totals.unknown),
+          sent:Number(totals.sent), blocked:Number(totals.blocked),
+          agedAttempts:Number(totals.agedAttempts),
+        },
+        needsManualReconciliation:Number(totals.unknown)>0 ||
+          (Number(totals.agedAttempts)>0 && !activeLease),
+        finalizable: job.state==='sending' && !activeLease &&
+          Number(totals.total)>0 && unsettled===0,
+      };
+    },
     // Read-only aggregate for admin/manual reconciliation; never expose content.
     async counts(id) {
       validJob(id);
