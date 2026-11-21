@@ -1,5 +1,6 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
 import {api} from 'sdk';
+import {ownerCallbackAllowed} from '../lib/owner_callback_guard.js';
 import {isBlocked,getSetting,setSetting,getStats,broadcastById,broadcastBatch,cancelBroadcast} from '../lib/store.js';
 import {IS_OWNER,text,home,checkSubscription,subscriptionScreen,
   sendScreen,genericScreen,serversScreen,statusScreen,adminScreen,
@@ -36,8 +37,7 @@ export default async function(query) {
   // Owner controls, including q:admin, must run only inside the owner's
   // private bot chat. Reject group/supergroup callbacks even from the owner.
   // This prevents admin state and message previews leaking into group chats.
-  if (ownerOnly(data) && (!owner || query?.message?.chat?.type !== 'private'
-      || Number(chatId) !== uid)) return ack(query,'غير مخوّل بهذه العملية');
+  if (ownerOnly(data) && !ownerCallbackAllowed(query, IS_OWNER)) return ack(query,'غير مخوّل بهذه العملية');
   if (!owner) {
     try {if(await isBlocked(uid)) {await ack(query);return sendScreen(chatId,{text:text.blocked},messageId);}}
     catch (_) { /* migration not yet applied */ }
