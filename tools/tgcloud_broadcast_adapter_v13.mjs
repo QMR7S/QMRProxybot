@@ -84,7 +84,11 @@ export function makeBroadcastV13Adapter(db) {
       const user = await db.get(
         'SELECT blocked FROM qmr_users_v6 WHERE user_id=:uid',
         { ':uid':userId });
-      return Number(user?.blocked ?? 0) === 1;
+      // No matching user must NOT default to eligible: migration may be incomplete.
+      if (!user || ![0,1].includes(Number(user.blocked))) {
+        throw Error('recipient absent from verified user table');
+      }
+      return Number(user.blocked) === 1;
     },
     markAttempt: (id,uid,token,fence,now) =>
       transition(id,uid,'pending','attempting',token,fence,now),
