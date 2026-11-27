@@ -24,3 +24,13 @@ export const qmrBroadcasts = table('qmr_broadcasts_v6', {
   failed: integer('failed').notNull().default(0),
   createdAt: integer('created_at').notNull(),
 });
+
+// Additive owner web-console action journal; original three tables unchanged.
+export const qmrBoardAudit = table('qmr_board_audit_v14', {
+  id: integer('id').primaryKey({autoIncrement:true}),
+  actor: integer('actor').notNull(),
+  action: text('action').notNull(),
+  target: text('target').notNull(),
+  createdAt: integer('created_at').notNull(),
+  state: text('state').notNull().default('pending'),
+});

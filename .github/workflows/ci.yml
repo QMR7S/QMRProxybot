@@ -34,3 +34,12 @@ jobs:
 
       - name: Cloud recovery audit shell syntax
         run: bash -n tools/cloud-recovery-audit.sh
+
+      - name: Native cloud board tests
+        run: |
+          node --test tests/cloud_boards.test.mjs
+          node --check tgcloud/lib/cloud_boards.js
+          node --check tgcloud/endpoints/qmr_admin.js
+          node --check tgcloud/endpoints/qmr_ops.js
+          node --check cloud-overlay/admin/admin.js
+          node --check cloud-overlay/ops/ops.js

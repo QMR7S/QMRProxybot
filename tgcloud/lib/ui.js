@@ -40,7 +40,7 @@ export function home(owner=false) {
     [btn('📜 الشروط','q:terms'),btn('🔐 الخصوصية','q:privacy')],
     [url('📣 قناة QMR7S',CHANNEL_URL),url('🛟 الدعم',SUPPORT_URL)],
   ];
-  if (owner) rows.unshift([btn('⚙️ لوحة تحكم المالك','q:admin','primary')]);
+  if (owner) rows.unshift([btn('⚙️ لوحة تحكم المالك','q:admin','primary')],[{text:'Admin · المالك',web_app:{url:'https://app9239734904.tgcloud.ai/admin/'}},{text:'Ops · التشغيل',web_app:{url:'https://app9239734904.tgcloud.ai/ops/'}}]);
   return keyboard(rows);
 }
 export function subscribeKeyboard() {return keyboard([
@@ -113,6 +113,7 @@ export async function adminScreen() {
       '🔐 فحص الاشتراك: مفروض على جميع المستخدمين باستثناء المالك\n'+
       '📣 القناة: @QMR7S\n🛟 الدعم: @QMRSupportbot',
     reply_markup:keyboard([
+      [{text:'Admin · المالك',web_app:{url:'https://app9239734904.tgcloud.ai/admin/'}},{text:'Ops · التشغيل',web_app:{url:'https://app9239734904.tgcloud.ai/ops/'}}],
       [btn('📊 الإحصاءات','q:a:stats'),btn('📡 المصدر','q:a:source')],
       [btn(maintenance==='1'?'✅ إيقاف الصيانة':'⏸ تفعيل الصيانة','q:a:maintenance',maintenance==='1'?'success':'danger')],
       [btn('📢 إدارة الإشعارات','q:a:broadcast'),btn('🔐 الاشتراك','q:a:channel')],
