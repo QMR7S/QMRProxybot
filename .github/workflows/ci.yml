@@ -72,3 +72,6 @@ jobs:
         run: |
           bash -n tools/resume_notifications_v13.sh
           node --check tools/native_notification_probe.mjs
+
+      - name: Stability deployment syntax
+        run: bash -n tools/deploy_stability_v14_2.sh
