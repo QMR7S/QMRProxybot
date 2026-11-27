@@ -46,3 +46,8 @@ jobs:
 
       - name: Native source validation
         run: node --test tests/extra_cloud.test.mjs
+
+      - name: Cloud V14 staging syntax
+        run: |
+          bash -n tools/deploy_cloud_v14.sh
+          python3 -m py_compile tools/cloud_v14_stage.py

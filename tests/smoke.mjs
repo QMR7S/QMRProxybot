@@ -39,7 +39,7 @@ try {
       answerCallbackQuery: async (params)=>{globalThis.qmrTest.answers.push(params);return true},
       setMyCommands:async ()=>true,setMyDescription:async()=>true,setMyShortDescription:async()=>true,
     };
-    export const db={insert(){throw Error('Database not migrated')},select(){throw Error('Database not migrated')},$count(){throw Error('Database not migrated')}};
+    export const db={insert(){throw Error('Database not migrated')},select(){return {from(table){return {where(){return {get:async()=>{if(globalThis.qmrTest.dbError)throw Error('Database unavailable');return null;}}}}}}},$count(){throw Error('Database not migrated')}};
     export const fetch=async ()=>{throw Error('No Internet in smoke test')};
   `);
   fs.writeFileSync(path.join(tmp,'node_modules','sdk','db.js'),`
@@ -128,6 +128,11 @@ try {
   reset();
   await m(fakeUser(10001,'/extra'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/المجموعة الإضافية/);
+  reset();
+  globalThis.qmrTest.dbError=true;
+  await m(fakeUser(10001,'/extra'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  globalThis.qmrTest.dbError=false;
   reset();
   await m(fakeUser(10001,'/faq'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/الأسئلة الشائعة/);

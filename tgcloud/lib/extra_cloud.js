@@ -30,7 +30,7 @@ export function selectExtra(fast,stable,stamp,now=Date.now()){
    const a=String(n.asn??'unknown'),c=/^[a-z]{2}$/i.test(n.country||'')?n.country.toUpperCase():'??';
    if(seen.has(key)||ips.has(n.ip)||(asn.get(a)||0)>=8||(country.get(c)||0)>=35)continue;
    seen.add(key);ips.add(n.ip);asn.set(a,(asn.get(a)||0)+1);country.set(c,(country.get(c)||0)+1);
-   nodes.push({server:n.server,port:n.port,secret:n.secret,source_rtt_ms:Math.round(n.rtt_ms),source_uptime:n.uptime,country:c,ads_status:'unknown'});
+   nodes.push({name:'إضافي '+String(nodes.length+1).padStart(3,'0')+' · '+c,server:n.server,port:n.port,secret:n.secret,origin:'extra',community_source:'0xRadikal',source_rtt_ms:Math.round(n.rtt_ms),median_rtt_ms:Math.round(n.rtt_ms),source_uptime:n.uptime,country:c,ads_status:'unknown'});
    if(nodes.length>=160)break;
  }
  return nodes.length>=15?{nodes,updated_at:stamp,from:'remote',stale:false}:null;
