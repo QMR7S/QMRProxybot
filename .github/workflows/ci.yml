@@ -43,3 +43,6 @@ jobs:
           node --check tgcloud/endpoints/qmr_ops.js
           node --check cloud-overlay/admin/admin.js
           node --check cloud-overlay/ops/ops.js
+
+      - name: Native source validation
+        run: node --test tests/extra_cloud.test.mjs

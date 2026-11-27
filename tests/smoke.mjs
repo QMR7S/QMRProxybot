@@ -123,6 +123,12 @@ try {
   await m(fakeUser(10001,'/app'));
   assert.ok(globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.some(row=>row.some(x=>x.web_app?.url)));
   reset();
+  await m(fakeUser(10001,'/quality'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/لا يوجد قياس/);
+  reset();
+  await m(fakeUser(10001,'/extra'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/المجموعة الإضافية/);
+  reset();
   await m(fakeUser(10001,'/faq'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/الأسئلة الشائعة/);
   reset();

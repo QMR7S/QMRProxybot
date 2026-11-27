@@ -1,5 +1,6 @@
 // Telegram Serverless — QMR Proxy v6. Does not change webhooks itself.
-import {api} from 'sdk';
+import {api,fetch as sdkFetch} from 'sdk';
+import {getExtraNodes,extraPage,qualityUnavailable} from 'lib/extra_cloud';
 import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser} from 'lib/store';
 import {IS_OWNER,text,home,subscriptionScreen,checkSubscription,sendScreen,
   genericScreen,serversScreen,statusScreen,adminScreen,keyboard} from 'lib/ui';
@@ -57,6 +58,12 @@ export default async function(message) {
       // remains unvalidated. Other bot functions are unaffected.
       return sendScreen(chatId,{text:'⛔ الإشعارات الجماعية متوقفة مؤقتًا لحماية المستلمين. لن تُنشأ مسودة جديدة حتى اكتمال ترحيل v13 واختبار قاعدة البيانات.'});
     }
+  }
+  if (['/extra','/servers_extra','/best','/quality'].includes(command)) {
+    const check=await checkSubscription(uid);
+    if(!check.ok)return sendScreen(chatId,subscriptionScreen(check));
+    if(!owner){try{if(await getSetting('maintenance','0')==='1')return sendScreen(chatId,{text:text.unavailable});}catch(_){return sendScreen(chatId,{text:text.unavailable});}}
+    return sendScreen(chatId,['/best','/quality'].includes(command)?qualityUnavailable():extraPage(await getExtraNodes(sdkFetch),arg||1));
   }
   if (command==='/servers'||command==='/proxy') {
     const check=await checkSubscription(uid);

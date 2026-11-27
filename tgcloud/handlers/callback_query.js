@@ -1,5 +1,6 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
-import {api} from 'sdk';
+import {api,fetch as sdkFetch} from 'sdk';
+import {getExtraNodes,extraPage,qualityUnavailable} from 'lib/extra_cloud';
 import {ownerCallbackAllowed} from 'lib/owner_callback_guard';
 import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from 'lib/store';
 import {IS_OWNER,text,home,checkSubscription,subscriptionScreen,
@@ -51,9 +52,9 @@ export default async function(query) {
     const membership=await checkSubscription(uid);
     if (!membership.ok) {await ack(query);return sendScreen(chatId,subscriptionScreen(membership),messageId);}
   }
-  if (!owner && (data.startsWith('q:servers:')||data==='q:status')) {
+  if (!owner && (data.startsWith('q:servers:')||data.startsWith('q:extra:')||data==='q:quality'||data==='q:status')) {
     try {if(await getSetting('maintenance','0')==='1') {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}}
-    catch (_) { /* default: no maintenance if DB not yet initialized */ }
+    catch (_) {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}
   }
   await ack(query);
   if (data==='q:home') return sendScreen(chatId,{text:text.welcome,reply_markup:home(owner)},messageId);
@@ -61,6 +62,8 @@ export default async function(query) {
     const page=Number(data.split(':')[2]);
     return sendScreen(chatId,await serversScreen(page),messageId);
   }
+  if (data.startsWith('q:extra:')) return sendScreen(chatId,extraPage(await getExtraNodes(sdkFetch),data.split(':')[2]),messageId);
+  if (data==='q:quality') return sendScreen(chatId,qualityUnavailable(),messageId);
   if (data==='q:status') return sendScreen(chatId,await statusScreen(),messageId);
   for (const section of ['help','steps','faq','safety','terms','privacy','about','channel','support','app']) {
     if (data==='q:'+section) return sendScreen(chatId,genericScreen(section,owner),messageId);
