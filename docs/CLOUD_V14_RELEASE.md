@@ -36,3 +36,6 @@ For rollback, preserve the old revision-5 modules and static manifest. A
 targeted code rollback retains the new audit table; never drop it or overwrite
 a newer database with old data. Full static rollback needs the verified original
 static directory and complete current module inventory; do not use reset or force.
+
+## Reviewed production baseline
+Owner-provided QMRCloud_V14_Actual_Source.zip (10 public files, 2026-11-27) confirms the deployed JS already uses Serverless.call, but references absent adminSummary/adminUsers/adminAudit/opsOverview endpoints, disables writes, and displays a placeholder audit. Its exact SHA-256 digests are now pinned in the stager; unknown variants still fail closed. The preserved HTML layout and public storage keys remain unchanged. The new overlay restores the intended owner-only actions and real audit reads, subject to runtime gates.

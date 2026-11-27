@@ -21,6 +21,20 @@ REF=REPO/"handoff/production-v12.5/source/QMRProxy_Termux_Rebuild/site"
 EXPECTED=set("""admin/admin.js admin/index.html app.js assets/instagram.svg assets/telegram.svg assets/ui-icons.svg assets/youtube.svg console.css contact/index.html extra-proxies.json extra-v11.css faq/index.html guide/index.html icon-192.png icon-512.png icon.svg index.html manifest.webmanifest mini/index.html mini/mini.css mini/mini.js navigation-v11.js nodes.json official-links.json ops/index.html ops/ops.js privacy/index.html proxy-tools-core.js proxy-tools-ui.js quality-public-v119.json quality-v119.css quality-v119.js refine-v11.css safety/index.html studio-v11.css styles.css sw.js terms/index.html theme-v11.css""".split())
 OVERLAYS=("admin/admin.js","admin/index.html","ops/ops.js","ops/index.html")
 MAX=8*1024*1024
+# Reviewed actual deployed revision-5 sources, owner export 2026-11-27.
+# Only exact recognized bytes qualify; unknown modifications still stop staging.
+REVIEWED_LIVE={
+    "admin/admin.js": "6b2bd6b80e16290bf51d174bce44bf38fdf0f0903ae044c2a022df8cd4c3ebef",
+    "admin/index.html": "655724e2e9942a19a2f6f4e00d2a257a4f3ab0ca8f86b98c28c6565c6d378a72",
+    "ops/ops.js": "68d1ca28c7662c341b1e3d00fdfb6d7c2387047d35b674f444dbed2c0ce9c8c3",
+    "ops/index.html": "4f39411faadb5382cb68595e01521581e11d62de22804dbfcdf0ec2bbf44a053",
+    "app.js": "3583bb969aeb48105aecb93f908b339b8a819ae7879208d71b8795b1ec9a24aa",
+    "index.html": "4ebb9cba039f9d2bcefddcc71623eedbb3c4b5bd7cad19c27c8d87f07f6653d3",
+    "mini/mini.js": "530b70d60cabcff10bf752a3cd04c8dc732dfc175863daf3baab6800ca305278",
+    "mini/index.html": "f9c6f9dc8cfc3486588412499e71d43ca50d92c07074b5be156cfc9904f7f676",
+    "privacy/index.html": "2bb8f9fa524f33d0c4abde68f91c69833b660dbfa7270058c06acdef873e097e",
+    "sw.js": "0d372b4a0b8f9d10b24bbb9de3f2be6be873366f726695dd1097b1105563eee9"
+}
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -170,11 +184,13 @@ def stage(backup,target,verify_live=True):
     hashes=verified(backup)
     if target.exists() or target.is_symlink():raise ValueError("target exists; nothing overwritten")
     if verify_live:check_remote(hashes)
-    # These four overlays were derived from the exact reference; refuse to
-    # replace if the captured production version differs.
-    for p in OVERLAYS:
-        if (backup/p).read_bytes()!=(REF/p).read_bytes():
-            raise ValueError("dashboard source diverged from reference: "+p)
+    # The reviewed export shows old read-only Admin/Ops JS using missing endpoints.
+    # Accept only known reference bytes or the exact reviewed production export.
+    for p,reviewed in REVIEWED_LIVE.items():
+        data=(backup/p).read_bytes()
+        if digest(data)!=reviewed and data!=(REF/p).read_bytes():
+            raise ValueError("dashboard source diverged from reference or reviewed export: "+p)
+    print("SOURCE BASELINE VERIFIED: known reference / reviewed production export",flush=True)
     target.mkdir(mode=0o700,parents=False)
     for p in hashes:
         dest=target/p

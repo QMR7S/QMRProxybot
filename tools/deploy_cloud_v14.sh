@@ -33,13 +33,19 @@ while IFS= read -r -d '' f; do node --check "$f"; done < <(find tgcloud cloud-di
 CTX="{initData:{user:{id:6246913670},auth_date:$(date +%s)}}"
 BAD="{initData:{user:{id:1},auth_date:$(date +%s)}}"
 echo "=== LIVE SDK READ-ONLY PREFLIGHT ==="
-npx --no-install tgcloud run endpoints/qmr_ops '{}' --ctx "$CTX" > "$R/ops-preflight.private.log" 2>&1
-grep -q bot_api_verified "$R/ops-preflight.private.log"
-grep -q activity "$R/ops-preflight.private.log"
-if npx --no-install tgcloud run endpoints/qmr_admin '{op:"summary"}' --ctx "$BAD" > "$R/denied.private.log" 2>&1; then
- echo "STOP: denied test unexpectedly returned success"; exit 1
+if ! npx --no-install tgcloud run endpoints/qmr_ops '{}' --ctx "$CTX" > "$R/ops-preflight.private.log" 2>&1 ||
+   ! grep -q bot_api_verified "$R/ops-preflight.private.log" ||
+   ! grep -q activity "$R/ops-preflight.private.log"; then
+ echo "STOP: SDK ops preflight did not verify; inspect $R/ops-preflight.private.log privately (no deployment)."
+ exit 1
 fi
-grep -Eq 'OWNER_ONLY|حساب المالك' "$R/denied.private.log" || { echo "STOP: denial not verified"; exit 1; }
+# Some CLI versions return zero even when the invoked module throws. Require
+# explicit denial evidence and absence of protected summary fields.
+npx --no-install tgcloud run endpoints/qmr_admin '{op:"summary"}' --ctx "$BAD" > "$R/denied.private.log" 2>&1 || true
+if ! grep -Eq 'OWNER_ONLY|حساب المالك' "$R/denied.private.log" ||
+   grep -Eq 'activity:|maintenance:|users:|events:' "$R/denied.private.log"; then
+ echo "STOP: denial not verified; private log retained"; exit 1
+fi
 echo "SDK AND OWNER GATE: PASS"
 echo "=== ADDITIVE SCHEMA ONLY (LOCAL PREVIEW; NO CLOUD WRITE YET) ==="
 npx --no-install tgcloud migrate --local --dry-run

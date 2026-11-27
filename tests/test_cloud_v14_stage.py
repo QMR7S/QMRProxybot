@@ -95,6 +95,16 @@ class CloudStage(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"live static file changed"):
                 stage.check_remote({"index.html":"good"})
 
+    def test_recognized_actual_dashboard_is_accepted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);backup,hashes=self.make_backup(root)
+            p=backup/"admin/admin.js"
+            p.write_text("reviewed deployed read-only source")
+            hashes["admin/admin.js"]=stage.digest(p.read_bytes())
+            (backup/"backup-manifest.json").write_text(json.dumps({"sha256":hashes,"failed":[]}))
+            with patch.dict(stage.REVIEWED_LIVE,{"admin/admin.js":hashes["admin/admin.js"]}):
+                self.assertEqual(len(stage.stage(backup,root/"dist",verify_live=False)),40)
+
     def test_no_blind_dashboard_overwrite(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);backup,hashes=self.make_backup(root)
