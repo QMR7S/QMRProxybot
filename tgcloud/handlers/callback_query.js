@@ -35,6 +35,7 @@ export default async function(query) {
   if (!Number.isSafeInteger(uid)||!chatId||!messageId||!data.startsWith('q:')) {
     return ack(query,'زر غير مدعوم');
   }
+  if(uid<=0||query?.message?.chat?.type!=='private'||Number(chatId)!==uid)return ack(query,'غير مخوّل بهذه العملية');
   const owner=IS_OWNER(uid);
   // Owner controls, including q:admin, must run only inside the owner's
   // private bot chat. Reject group/supergroup callbacks even from the owner.
@@ -42,7 +43,7 @@ export default async function(query) {
   if (ownerOnly(data) && !ownerCallbackAllowed(query, IS_OWNER)) return ack(query,'غير مخوّل بهذه العملية');
   if (!owner) {
     try {if(await isBlocked(uid)) {await ack(query);return sendScreen(chatId,{text:text.blocked},messageId);}}
-    catch (_) { /* migration not yet applied */ }
+    catch (_) {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}
   }
   if (data==='q:verify') {
     const membership=await checkSubscription(uid);

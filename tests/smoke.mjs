@@ -142,5 +142,28 @@ try {
   reset();
   await m(fakeUser(6246913670,'/setup'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/configure_profile.py/);
+  reset();
+  globalThis.qmrTest.dbError=true;
+  await m(fakeUser(10001,'/servers'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  reset();
+  await cb(fakeCb(10001,'q:servers:1'));
+  assert.match(globalThis.qmrTest.edits.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  reset();
+  await m(fakeUser(6246913670,'/admin'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/وضع الصيانة: غير متحقق/);
+  assert.ok(!globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.flat().some(b=>b.callback_data==='q:a:maintenance'));
+  globalThis.qmrTest.dbError=false;
+  reset();
+  const group=fakeCb(10001,'q:servers:1');group.message.chat={id:-123,type:'group'};
+  await cb(group);
+  assert.equal(globalThis.qmrTest.edits.length,0);
+  assert.match(globalThis.qmrTest.answers.at(-1)?.text||'',/غير مخوّل/);
+  reset();
+  const wrong=fakeCb(10001,'q:home');wrong.message.chat.id=10002;
+  await cb(wrong);assert.equal(globalThis.qmrTest.edits.length,0);
+  reset();
+  await m(fakeUser(10001,'/servers\n2'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/11\. /);
   console.log('PASS: v7 integration assertions — Mini App, safety, FAQ, subscription, callback permissions, fallback links, owner-only admin, safe profile setup');
 } finally {fs.rmSync(tmp,{recursive:true,force:true});}

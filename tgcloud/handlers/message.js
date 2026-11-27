@@ -8,7 +8,7 @@ import {IS_OWNER,text,home,subscriptionScreen,checkSubscription,sendScreen,
 
 function commandAndArg(input) {
   const raw=String(input||'').trim();
-  const space=raw.indexOf(' ');
+  const space=raw.search(/\s/);
   const command=(space<0?raw:raw.slice(0,space)).split('@')[0].toLowerCase();
   return {command,arg:space<0?'':raw.slice(space+1).trim()};
 }
@@ -33,7 +33,7 @@ export default async function(message) {
   if (!owner) {
     try { if (await isBlocked(uid)) {
       await api.sendMessage({chat_id:chatId,text:text.blocked}); return;
-    }} catch (_) { /* No table yet: subscription is enforced separately */ }
+    }} catch (_) {return sendScreen(chatId,{text:text.unavailable});}
   }
 
   if (command==='/start') {
@@ -88,7 +88,7 @@ export default async function(message) {
   if (command==='/servers'||command==='/proxy') {
     const check=await checkSubscription(uid);
     if (!check.ok) return sendScreen(chatId,subscriptionScreen(check));
-    if (!owner) {try{if(await getSetting('maintenance','0')==='1')return sendScreen(chatId,{text:text.unavailable});}catch(_){}}
+    if (!owner) {try{if(await getSetting('maintenance','0')==='1')return sendScreen(chatId,{text:text.unavailable});}catch(_){return sendScreen(chatId,{text:text.unavailable});}}
     const requested=Number(arg||'1');
     return sendScreen(chatId,await serversScreen(requested));
   }
