@@ -13,7 +13,9 @@ class ProfileV7(unittest.TestCase):
   self.assertTrue(p.read_bytes().startswith(bytes([255,216,255])))
  def test_mini_app_button_is_real_webapp(self):
   s=(ROOT/'tgcloud/lib/ui.js').read_text()
-  self.assertIn('web_app:{url:SITE_URL}',s)
+  self.assertIn('web_app:{url:MINI_APP_URL}',s)
+  self.assertIn("MINI_APP_URL = 'https://app9239734904.tgcloud.ai/mini/'",s)
+  self.assertIn("SITE_URL = 'https://qmr-proxy.alialnyamy675.chatgpt.site'",s)
   self.assertIn('q:faq',s)
   self.assertIn('q:safety',s)
  def test_owner_authorization_is_preserved(self):
