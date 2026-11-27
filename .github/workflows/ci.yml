@@ -61,3 +61,6 @@ jobs:
 
       - name: Controlled notification SQL and concurrency
         run: node --test tests/broadcast_control_sqlite.test.mjs
+
+      - name: Controlled notifications deployment syntax
+        run: bash -n tools/deploy_notifications_v13.sh
