@@ -16,8 +16,8 @@ test('action validation prevents owner ban and unconfirmed writes',()=>{
 });
 function fixture(fail=false){
  const calls=[];
- const db={get:async(sql,params)=>{calls.push(sql);if(sql.startsWith('SELECT COUNT'))return {users:2,active_7d:1,blocked:0,requests:5};if(sql.startsWith('INSERT'))return {id:1};if(sql.startsWith('UPDATE'))return {id:1};throw Error('unexpected query');},
- all:async(sql)=>{calls.push(sql);return [];}};
+ const db={get:async(sql,params)=>{calls.push(sql);if(sql.startsWith('SELECT COUNT'))return {users:2,active_7d:1,blocked:0,requests:5};if(!sql.startsWith('SELECT'))throw Error('Read query looks like a write one');throw Error('unexpected query');},
+ all:async(sql)=>{calls.push(sql);return [];},insertAudit:async()=>{calls.push('INSERT audit');return {id:1};},updateOne:async()=>{calls.push('UPDATE audit');return {id:1};}};
  const boards=createBoards({db,api:{getMe:async()=>({id:9239734904,username:'QMRProxybot'})},getNodes:async()=>({nodes:[{}],updated_at:'2026-11-27',from:'remote'}),getSetting:async()=> '0',setSetting:async()=>{calls.push('mutate');if(fail)throw Error('lost response');},setBlocked:async()=>{calls.push('mutate');},now});
  return {boards,calls};
 }

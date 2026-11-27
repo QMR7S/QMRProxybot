@@ -64,3 +64,6 @@ jobs:
 
       - name: Controlled notifications deployment syntax
         run: bash -n tools/deploy_notifications_v13.sh
+
+      - name: Native SDK write adapter syntax
+        run: node --check tgcloud/lib/sdk_write_adapter.js

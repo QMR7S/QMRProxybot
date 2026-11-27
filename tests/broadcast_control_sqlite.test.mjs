@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
+import {strictSqliteDb} from './strict_sqlite_db.mjs';
 import {makeBroadcastControl} from '../tgcloud/lib/broadcast_control.js';
 const OWNER=1234;
 function fixture(send){
@@ -8,7 +9,7 @@ function fixture(send){
  raw.exec("CREATE TABLE qmr_users_v6(user_id INTEGER PRIMARY KEY,blocked INTEGER NOT NULL); INSERT INTO qmr_users_v6 VALUES(1234,0),(12,0),(13,0),(14,1);CREATE TABLE qmr_notify_optin_v13(user_id INTEGER PRIMARY KEY,enabled_at INTEGER NOT NULL);CREATE TABLE qmr_notify_jobs_v13(id INTEGER PRIMARY KEY AUTOINCREMENT,message_id INTEGER UNIQUE NOT NULL,scope TEXT NOT NULL,content TEXT NOT NULL,state TEXT NOT NULL,created_ms INTEGER NOT NULL,step_seq INTEGER NOT NULL DEFAULT 0);CREATE TABLE qmr_notify_delivery_v13(id INTEGER PRIMARY KEY AUTOINCREMENT,job_id INTEGER NOT NULL,user_id INTEGER NOT NULL,state TEXT NOT NULL,attempted_ms INTEGER,resolved_ms INTEGER,retry_after_ms INTEGER,UNIQUE(job_id,user_id));");
  let time=1700000000000;
  const sends=[];
- const db={get:async(sql,args)=>raw.prepare(sql).get(args),all:async(sql,args)=>raw.prepare(sql).all(args),run:async(sql,args)=>raw.prepare(sql).run(args)};
+ const db=strictSqliteDb(raw);
  const ctl=makeBroadcastControl(db,async(uid,text)=>{sends.push(uid);return send?send(uid,text):{message_id:100,chat:{id:uid}};},OWNER,()=>time);
  return {ctl,raw,sends,advance:ms=>time+=ms};
 }
@@ -78,3 +79,5 @@ test('orphan attempt requires explicit aged abandonment',async()=>{
  f.advance(300001);const d=await f.ctl.abandon(OWNER,j.id);assert.equal(d.state,'cancelled');assert.equal(d.counts.unknown,1);assert.deepEqual(f.sends,[]);assert.equal(await f.ctl.unlocked(),false);
  }finally{f.raw.close();}
 });
+
+test('strict cloud contract rejects raw write through read methods',async()=>{const f=fixture();try{await assert.rejects(strictSqliteDb(f.raw).get("UPDATE qmr_notify_jobs_v13 SET state='done' WHERE 0 RETURNING id"),/Read query/);await assert.rejects(strictSqliteDb(f.raw).all("DELETE FROM qmr_notify_jobs_v13 WHERE 0 RETURNING id"),/Read query/);}finally{f.raw.close();}});

@@ -56,13 +56,12 @@ export function createBoards({db,api,getNodes,getSetting,setSetting,setBlocked,n
     const a=parseAction(input);
     // Persist intent BEFORE mutation. There is no assumed multi-statement transaction.
     // Interrupted work stays 'pending' and requires reconciliation, never automatic retry.
-    const row=await db.get('INSERT INTO qmr_board_audit_v14(actor,action,target,created_at,state) VALUES (:actor,:action,:target,:t,\'pending\') RETURNING id',
-       {':actor':actor,':action':a.action,':target':a.target,':t':Math.floor(now()/1000)});
+    const row=await db.insertAudit({actor,action:a.action,target:a.target,createdAt:Math.floor(now()/1000),state:'pending'});
     if(!Number.isSafeInteger(row?.id)||row.id<=0)throw Error('AUDIT_UNAVAILABLE');
     try {
       if(a.action==='maintenance') await setSetting('maintenance',a.enabled?'1':'0');
       else await setBlocked(a.uid,a.action==='ban');
-      const updated=await db.get("UPDATE qmr_board_audit_v14 SET state='applied' WHERE id=:id AND state='pending' RETURNING id",{':id':row.id});
+      const updated=await db.updateOne('audit',{state:'applied'},"id=:id AND state='pending'",{':id':row.id});
       if(updated?.id!==row.id)throw Error('AUDIT_UNCERTAIN');
     }catch(_) {throw Error('ACTION_UNCERTAIN_RELOAD');}
     return {ok:true};

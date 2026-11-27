@@ -1,8 +1,9 @@
-import {db,api,fetch as sdkFetch,EndpointError} from 'sdk';
+import {api,fetch as sdkFetch,EndpointError} from 'sdk';
+import {nativeDb} from 'lib/sdk_write_adapter';
 import {getNodes} from 'lib/nodes';
 import {getSetting,setSetting,setBlocked} from 'lib/store';
 import {createBoards} from 'lib/cloud_boards_core';
-const boards=createBoards({db,api,getNodes:()=>getNodes(sdkFetch),getSetting,setSetting,setBlocked});
+const boards=createBoards({db:nativeDb,api,getNodes:()=>getNodes(sdkFetch),getSetting,setSetting,setBlocked});
 const labels={
  OWNER_ONLY:'هذه اللوحة لحساب المالك فقط.',
  AUTH_DATE_MISSING:'AUTH_DATE_MISSING — لم توفر المنصة تاريخ الجلسة الموقّعة.',

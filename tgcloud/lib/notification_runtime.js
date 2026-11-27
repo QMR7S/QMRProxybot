@@ -1,7 +1,8 @@
-import {db,api} from 'sdk';
+import {api} from 'sdk';
+import {nativeDb} from 'lib/sdk_write_adapter';
 import {makeBroadcastControl} from 'lib/broadcast_control';
 import {OWNER_ID} from 'lib/ui';
-export const notifications=makeBroadcastControl(db,(uid,content)=>api.sendMessage({chat_id:uid,text:'📣 QMR Proxy\n\n'+content,link_preview_options:{is_disabled:true}}),OWNER_ID);
+export const notifications=makeBroadcastControl(nativeDb,(uid,content)=>api.sendMessage({chat_id:uid,text:'📣 QMR Proxy\n\n'+content,link_preview_options:{is_disabled:true}}),OWNER_ID);
 export const notificationHelp={text:'📣 إشعارات QMR Proxy\n\n/broadcast_test نص — مسودة اختبار للمالك فقط\n/broadcast نص — مسودة للمشتركين طوعًا بعد نجاح الاختبار\n/broadcast_status رقم — حالة المسودة والتسليم\n/broadcast_abandon رقم CONFIRM — إيقاف نهائي للمحاولة غير المحسومة بعد خمس دقائق، دون إعادة إرسال\n\nالمستخدم: /notifications on أو /notifications off. لا تُرسل المسودة حتى تأكيدها ثم طلب الإرسال.',reply_markup:{inline_keyboard:[[{text:'لوحة المالك',callback_data:'q:admin'}]]}};
 export function notificationScreen(d,preview=''){
  const states={preparing:'قيد التجهيز',draft:'مسودة',sending:'مؤكد · إرسال يدوي',done:'منتهٍ',cancelled:'ملغى'};
