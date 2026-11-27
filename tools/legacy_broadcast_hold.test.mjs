@@ -17,9 +17,8 @@ test('no legacy send batch reachable from callback imports or function body',()=
 });
 test('owner broadcast command never creates a legacy draft',()=>{
   assert.doesNotMatch(message,/\bnewBroadcast\b/);
-  const block=message.slice(message.indexOf("if (command==='/broadcast')"));
-  assert.match(block,/SAFETY HOLD/);
-  assert.doesNotMatch(block,/\bapi\.sendMessage\b/);
+  assert.match(message,/notifications\.create\(/);
+  assert.doesNotMatch(message,/\bbroadcastBatch\b/);
 });
 test('legacy risk is retained as a visible migration blocker',()=>{
   assert.match(store,/export async function broadcastBatch\(/);

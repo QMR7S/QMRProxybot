@@ -31,3 +31,47 @@ jobs:
         run: node tests/smoke.mjs
       - name: TGCloud root repair syntax
         run: bash -n scripts/repair-tgcloud-root.sh
+
+      - name: Cloud recovery audit shell syntax
+        run: bash -n tools/cloud-recovery-audit.sh
+
+      - name: Native cloud board tests
+        run: |
+          node --test tests/cloud_boards.test.mjs
+          node --check tgcloud/lib/cloud_boards.js
+          node --check tgcloud/endpoints/qmr_admin.js
+          node --check tgcloud/endpoints/qmr_ops.js
+          node --check cloud-overlay/admin/admin.js
+          node --check cloud-overlay/ops/ops.js
+
+      - name: Native source validation
+        run: node --test tests/extra_cloud.test.mjs
+
+      - name: Cloud V14 staging syntax
+        run: |
+          bash -n tools/deploy_cloud_v14.sh
+          python3 -m py_compile tools/cloud_v14_stage.py
+
+      - name: Node 22 for SQLite integration
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Native board real SQLite
+        run: node --test tests/cloud_boards_sqlite.test.mjs
+
+      - name: Controlled notification SQL and concurrency
+        run: node --test tests/broadcast_control_sqlite.test.mjs
+
+      - name: Controlled notifications deployment syntax
+        run: bash -n tools/deploy_notifications_v13.sh
+
+      - name: Native SDK write adapter syntax
+        run: node --check tgcloud/lib/sdk_write_adapter.js
+
+      - name: Resume notification deployment syntax
+        run: |
+          bash -n tools/resume_notifications_v13.sh
+          node --check tools/native_notification_probe.mjs
+
+      - name: Stability deployment syntax
+        run: bash -n tools/deploy_stability_v14_2.sh

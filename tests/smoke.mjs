@@ -8,6 +8,23 @@ const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..');
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'qmr-v6-smoke-'));
 try {
   fs.cpSync(path.join(root,'tgcloud'),path.join(tmp,'tgcloud'),{recursive:true});
+  // Production uses Telegram's canonical module IDs. Translate ONLY in the Node mock.
+  function adapt(dir) {
+    for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+      const file=path.join(dir,entry.name);
+      if(entry.isDirectory()) { adapt(file); continue; }
+      if(!entry.name.endsWith('.js')) continue;
+      const code=fs.readFileSync(file,'utf8');
+      const adapted=code.replace(/from\s+(['"])(schema|lib\/[\w/-]+)\1/g,
+        (_,quote,id)=>{
+          let target=path.relative(path.dirname(file),path.join(tmp,'tgcloud',id+'.js')).split(path.sep).join('/');
+          if(!target.startsWith('.')) target='./'+target;
+          return 'from '+quote+target+quote;
+        });
+      fs.writeFileSync(file,adapted);
+    }
+  }
+  adapt(path.join(tmp,'tgcloud'));
   fs.mkdirSync(path.join(tmp,'node_modules','sdk'),{recursive:true});
   fs.writeFileSync(path.join(tmp,'package.json'),JSON.stringify({type:'module'}));
   fs.writeFileSync(path.join(tmp,'node_modules','sdk','package.json'),JSON.stringify({name:'sdk',type:'module',exports:{'.':'./index.js','./db':'./db.js'}}));
@@ -22,14 +39,14 @@ try {
       answerCallbackQuery: async (params)=>{globalThis.qmrTest.answers.push(params);return true},
       setMyCommands:async ()=>true,setMyDescription:async()=>true,setMyShortDescription:async()=>true,
     };
-    export const db={insert(){throw Error('Database not migrated')},select(){throw Error('Database not migrated')},$count(){throw Error('Database not migrated')}};
+    export const db={insert(){throw Error('Database not migrated')},select(){return {from(table){return {where(){return {get:async()=>{if(globalThis.qmrTest.dbError)throw Error('Database unavailable');return null;}}}}}}},$count(){throw Error('Database not migrated')}};
     export const fetch=async ()=>{throw Error('No Internet in smoke test')};
   `);
   fs.writeFileSync(path.join(tmp,'node_modules','sdk','db.js'),`
     const col=()=>({primaryKey(){return this},notNull(){return this},default(){return this},unique(){return this}});
     export const table=(name,columns,fn)=>({name,...columns});
     export const integer=col; export const text=col;
-    export const index=()=>({on(){return {}}});
+    export const index=()=>({on(){return {}}}); export const uniqueIndex=index;
     export const sql=(s,...xs)=>'';
     export const eq=()=>({});export const gt=()=>({});export const asc=()=>({});
   `);
@@ -38,7 +55,7 @@ try {
   const cb=(await import(pathToFileURL(path.join(tmp,'tgcloud/handlers/callback_query.js')).href)).default;
   const {getNodes,selectLiveNodes}=await import(pathToFileURL(path.join(tmp,'tgcloud/lib/nodes.js')).href);
   const fakeUser=(id,txt)=>({chat:{id,type:'private'},from:{id},text:txt});
-  const fakeCb=(id,data)=>({id:'callback1',data,from:{id},message:{chat:{id},message_id:321}});
+  const fakeCb=(id,data)=>({id:'callback1',data,from:{id},message:{chat:{id,type:'private'},message_id:321}});
   const reset=()=>{globalThis.qmrTest.messages=[];globalThis.qmrTest.edits=[];globalThis.qmrTest.answers=[];};
 
   await m(fakeUser(10001,'/start'));
@@ -98,10 +115,24 @@ try {
   globalThis.qmrTest.editError=null;
   assert.equal(defaultBtn.inline_keyboard[2][0].style,undefined);
   const appRow=defaultBtn.inline_keyboard.find(row=>row.some(button=>button.web_app));
-  assert.equal(appRow?.[0]?.web_app?.url,'https://qmr-proxy.alialnyamy675.chatgpt.site');
+  assert.equal(appRow?.[0]?.web_app?.url,'https://app9239734904.tgcloud.ai/mini/');
+  const {serversScreen}=await import(pathToFileURL(path.join(tmp,'tgcloud/lib/ui.js')).href);
+  assert.match((await serversScreen(2.9)).text,/11\. /);
+  assert.match((await serversScreen(Infinity)).text,/01\. /);
   reset();
   await m(fakeUser(10001,'/app'));
   assert.ok(globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.some(row=>row.some(x=>x.web_app?.url)));
+  reset();
+  await m(fakeUser(10001,'/quality'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/لا يوجد قياس/);
+  reset();
+  await m(fakeUser(10001,'/extra'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/المجموعة الإضافية/);
+  reset();
+  globalThis.qmrTest.dbError=true;
+  await m(fakeUser(10001,'/extra'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  globalThis.qmrTest.dbError=false;
   reset();
   await m(fakeUser(10001,'/faq'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/الأسئلة الشائعة/);
@@ -111,5 +142,28 @@ try {
   reset();
   await m(fakeUser(6246913670,'/setup'));
   assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/configure_profile.py/);
+  reset();
+  globalThis.qmrTest.dbError=true;
+  await m(fakeUser(10001,'/servers'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  reset();
+  await cb(fakeCb(10001,'q:servers:1'));
+  assert.match(globalThis.qmrTest.edits.at(-1)?.text||'',/متوقفة مؤقتاً/);
+  reset();
+  await m(fakeUser(6246913670,'/admin'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/وضع الصيانة: غير متحقق/);
+  assert.ok(!globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.flat().some(b=>b.callback_data==='q:a:maintenance'));
+  globalThis.qmrTest.dbError=false;
+  reset();
+  const group=fakeCb(10001,'q:servers:1');group.message.chat={id:-123,type:'group'};
+  await cb(group);
+  assert.equal(globalThis.qmrTest.edits.length,0);
+  assert.match(globalThis.qmrTest.answers.at(-1)?.text||'',/غير مخوّل/);
+  reset();
+  const wrong=fakeCb(10001,'q:home');wrong.message.chat.id=10002;
+  await cb(wrong);assert.equal(globalThis.qmrTest.edits.length,0);
+  reset();
+  await m(fakeUser(10001,'/servers\n2'));
+  assert.match(globalThis.qmrTest.messages.at(-1)?.text||'',/11\. /);
   console.log('PASS: v7 integration assertions — Mini App, safety, FAQ, subscription, callback permissions, fallback links, owner-only admin, safe profile setup');
 } finally {fs.rmSync(tmp,{recursive:true,force:true});}

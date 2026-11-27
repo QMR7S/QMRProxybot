@@ -1,10 +1,12 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
-import {api} from 'sdk';
-import {ownerCallbackAllowed} from '../lib/owner_callback_guard.js';
-import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from '../lib/store.js';
+import {api,fetch as sdkFetch} from 'sdk';
+import {notifications,notificationHelp,notificationScreen,notificationError} from 'lib/notification_runtime';
+import {getExtraNodes,extraPage,qualityUnavailable} from 'lib/extra_cloud';
+import {ownerCallbackAllowed} from 'lib/owner_callback_guard';
+import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from 'lib/store';
 import {IS_OWNER,text,home,checkSubscription,subscriptionScreen,
   sendScreen,genericScreen,serversScreen,statusScreen,adminScreen,
-  broadcastIntro,keyboard} from '../lib/ui.js';
+  broadcastIntro,keyboard} from 'lib/ui';
 
 const ownerOnly = data => data==='q:admin'||data.startsWith('q:a:');
 async function ack(query,msg) {
@@ -33,6 +35,7 @@ export default async function(query) {
   if (!Number.isSafeInteger(uid)||!chatId||!messageId||!data.startsWith('q:')) {
     return ack(query,'زر غير مدعوم');
   }
+  if(uid<=0||query?.message?.chat?.type!=='private'||Number(chatId)!==uid)return ack(query,'غير مخوّل بهذه العملية');
   const owner=IS_OWNER(uid);
   // Owner controls, including q:admin, must run only inside the owner's
   // private bot chat. Reject group/supergroup callbacks even from the owner.
@@ -40,7 +43,7 @@ export default async function(query) {
   if (ownerOnly(data) && !ownerCallbackAllowed(query, IS_OWNER)) return ack(query,'غير مخوّل بهذه العملية');
   if (!owner) {
     try {if(await isBlocked(uid)) {await ack(query);return sendScreen(chatId,{text:text.blocked},messageId);}}
-    catch (_) { /* migration not yet applied */ }
+    catch (_) {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}
   }
   if (data==='q:verify') {
     const membership=await checkSubscription(uid);
@@ -51,9 +54,9 @@ export default async function(query) {
     const membership=await checkSubscription(uid);
     if (!membership.ok) {await ack(query);return sendScreen(chatId,subscriptionScreen(membership),messageId);}
   }
-  if (!owner && (data.startsWith('q:servers:')||data==='q:status')) {
+  if (!owner && (data.startsWith('q:servers:')||data.startsWith('q:extra:')||data==='q:quality'||data==='q:status')) {
     try {if(await getSetting('maintenance','0')==='1') {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}}
-    catch (_) { /* default: no maintenance if DB not yet initialized */ }
+    catch (_) {await ack(query);return sendScreen(chatId,{text:text.unavailable},messageId);}
   }
   await ack(query);
   if (data==='q:home') return sendScreen(chatId,{text:text.welcome,reply_markup:home(owner)},messageId);
@@ -61,6 +64,8 @@ export default async function(query) {
     const page=Number(data.split(':')[2]);
     return sendScreen(chatId,await serversScreen(page),messageId);
   }
+  if (data.startsWith('q:extra:')) return sendScreen(chatId,extraPage(await getExtraNodes(sdkFetch),data.split(':')[2]),messageId);
+  if (data==='q:quality') return sendScreen(chatId,qualityUnavailable(),messageId);
   if (data==='q:status') return sendScreen(chatId,await statusScreen(),messageId);
   for (const section of ['help','steps','faq','safety','terms','privacy','about','channel','support','app']) {
     if (data==='q:'+section) return sendScreen(chatId,genericScreen(section,owner),messageId);
@@ -75,7 +80,15 @@ export default async function(query) {
   }
   if (data==='q:a:source') return sendScreen(chatId,await statusScreen(),messageId);
   if (data==='q:a:channel') return sendScreen(chatId,{text:'📣 الاشتراك الإجباري\n\nالقناة: @QMR7S\nتحقق الأعضاء: Telegram getChatMember\n\nيجب أن يكون @QMRProxybot مشرفاً في القناة لكي يكون فحص العضوية موثوقاً.\n\nمالك البوت مستثنى من شرط الاشتراك لإدارة الطوارئ.',reply_markup:keyboard([[{text:'⚙️ لوحة المالك',callback_data:'q:admin'}]])},messageId);
-  if (data==='q:a:broadcast') return sendScreen(chatId,broadcastIntro(),messageId);
+  if (data==='q:a:broadcast') return sendScreen(chatId,notificationHelp,messageId);
+  if(data.startsWith('q:a:n13:')){
+    const match=/^q:a:n13:(confirm|step|cancel|status):([1-9][0-9]*)(?::(0|[1-9][0-9]*))?$/.exec(data);
+    if(!match)return;
+    const id=Number(match[2]);if(!Number.isSafeInteger(id)||((match[1]==='step')!==Boolean(match[3])))return;
+    const seq=match[3]===undefined?undefined:Number(match[3]);if(seq!==undefined&&!Number.isSafeInteger(seq))return;
+    try{const action=match[1]==='status'?'summary':match[1];return sendScreen(chatId,notificationScreen(await notifications[action](uid,id,seq)),messageId);}
+    catch(e){return sendScreen(chatId,notificationError(e),messageId);}
+  }
   if (data==='q:a:maintenance') {
     let next='1';
     try {next=(await getSetting('maintenance','0'))==='1'?'0':'1';}
