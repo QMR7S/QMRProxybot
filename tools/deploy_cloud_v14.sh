@@ -29,7 +29,7 @@ for f in schema.js lib/ui.js lib/cloud_boards_core.js lib/cloud_boards.js lib/ex
  mkdir -p "$R/tgcloud/$(dirname "$f")"
  cp "$REPO/tgcloud/$f" "$R/tgcloud/$f"
 done
-find tgcloud cloud-dist -name '*.js' -type f -exec node --check {} \;
+while IFS= read -r -d '' f; do node --check "$f"; done < <(find tgcloud cloud-dist -name '*.js' -type f -print0)
 CTX="{initData:{user:{id:6246913670},auth_date:$(date +%s)}}"
 BAD="{initData:{user:{id:1},auth_date:$(date +%s)}}"
 echo "=== LIVE SDK READ-ONLY PREFLIGHT ==="
