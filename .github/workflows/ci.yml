@@ -31,3 +31,6 @@ jobs:
         run: node tests/smoke.mjs
       - name: TGCloud root repair syntax
         run: bash -n scripts/repair-tgcloud-root.sh
+
+      - name: Cloud recovery audit shell syntax
+        run: bash -n tools/cloud-recovery-audit.sh
