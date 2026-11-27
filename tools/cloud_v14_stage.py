@@ -13,7 +13,7 @@ import time
 import sys
 from urllib.error import URLError, HTTPError
 import urllib.request
-from urllib.parse import quote
+from urllib.parse import quote, urljoin, urlsplit
 
 REPO=Path(__file__).resolve().parents[1]
 BASE="https://app9239734904.tgcloud.ai/"
@@ -38,15 +38,25 @@ def verified(backup):
             raise ValueError("backup hash mismatch: "+p)
     return hashes
 
+class StaticRedirect(Exception):
+    def __init__(self,location):
+        self.location=location
+        super().__init__("static redirect")
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*a,**kw):return None
 
 def python_download(url):
     op=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
     req=urllib.request.Request(url,headers={"Cache-Control":"no-cache"})
-    with op.open(req,timeout=15) as r:
-        if r.status!=200:raise ValueError("unexpected HTTP status")
-        return r.read(MAX+1)
+    try:
+        with op.open(req,timeout=15) as r:
+            if r.status!=200:raise ValueError("unexpected HTTP status")
+            return r.read(MAX+1)
+    except HTTPError as exc:
+        if exc.code in (301,302,303,307,308):
+            raise StaticRedirect(exc.headers.get("Location")) from None
+        raise
 
 def curl_download(url):
     # No redirect following, no TLS bypass, no inherited curl config or proxy.
@@ -56,20 +66,54 @@ def curl_download(url):
         r=subprocess.run(["curl","-q","--silent","--show-error","--noproxy","*",
             "--proto","=https","--connect-timeout","10","--max-time","25",
             "--max-filesize",str(MAX),"--header","Cache-Control: no-cache",
-            "--output",str(target),"--write-out","%{http_code}",url],
+            "--output",str(target),"--write-out","%{http_code}\n%{redirect_url}",url],
             capture_output=True,text=True,timeout=30)
         if r.returncode!=0:raise OSError("curl exit "+str(r.returncode))
-        if r.stdout.strip()!="200":raise ValueError("unexpected HTTP status")
+        status,_,location=r.stdout.partition("\n")
+        if status in ("301","302","303","307","308"):
+            raise StaticRedirect(location.strip())
+        if status!="200":raise ValueError("unexpected HTTP status: "+status)
         if not target.is_file() or target.stat().st_size>MAX:raise ValueError("invalid body size")
         return target.read_bytes()
 
+def static_paths(p):
+    path="/"+quote(p,safe="/")
+    if p=="index.html":return {path,"/"}
+    if p.endswith("/index.html"):
+        directory=path[:-len("index.html")]
+        return {path,directory,directory.rstrip("/")}
+    return {path}
+
+def redirect_target(current,location,p):
+    if not isinstance(location,str) or not location or any(ord(c)<33 or ord(c)==127 for c in location):
+        raise ValueError("invalid static redirect: "+p)
+    candidate=urljoin(current,location)
+    dest=urlsplit(candidate)
+    base=urlsplit(BASE)
+    if (dest.scheme!=base.scheme or dest.netloc!=base.netloc or
+        dest.path not in static_paths(p) or dest.query not in ("","qmr_verify=14") or dest.fragment):
+        raise ValueError("unexpected static redirect: "+p)
+    return candidate
+
+def download_static(download,url,p):
+    seen=set()
+    for _ in range(4):
+        if url in seen:raise ValueError("static redirect loop: "+p)
+        seen.add(url)
+        try:return download(url)
+        except StaticRedirect as exc:
+            url=redirect_target(url,exc.location,p)
+    raise ValueError("too many static redirects: "+p)
+
 def remote_digest(p):
-    url=BASE+quote(p,safe="/")+"?qmr_verify=14"
+    # Directory index files have a canonical public directory URL.
+    canonical=p[:-len("index.html")] if p=="index.html" or p.endswith("/index.html") else p
+    url=BASE+quote(canonical,safe="/")+"?qmr_verify=14"
     failures=[]
     for attempt in range(2):
         for download in (python_download,curl_download):
             try:
-                data=download(url)
+                data=download_static(download,url,p)
                 if not data or len(data)>MAX:raise ValueError("invalid body size")
                 return digest(data)
             except HTTPError as e:

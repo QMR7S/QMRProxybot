@@ -44,7 +44,33 @@ class CloudStage(unittest.TestCase):
     def test_dns_failure_uses_verified_https_fallback(self):
         with patch.object(stage,"python_download",side_effect=stage.URLError("DNS failure")), patch.object(stage,"curl_download",return_value=b"actual remote content") as curl:
             self.assertEqual(stage.remote_digest("index.html"),stage.digest(b"actual remote content"))
-            curl.assert_called_once_with(stage.BASE+"index.html?qmr_verify=14")
+            curl.assert_called_once_with(stage.BASE+"?qmr_verify=14")
+
+    def test_canonical_directory_url(self):
+        with patch.object(stage,"python_download",return_value=b"admin") as download:
+            self.assertEqual(stage.remote_digest("admin/index.html"),stage.digest(b"admin"))
+            download.assert_called_once_with(stage.BASE+"admin/?qmr_verify=14")
+
+    def test_only_equivalent_index_redirect_is_followed(self):
+        with patch.object(stage,"python_download",side_effect=[stage.StaticRedirect("/admin"),b"admin"]) as download:
+            self.assertEqual(stage.remote_digest("admin/index.html"),stage.digest(b"admin"))
+            self.assertEqual(download.call_args_list[1].args[0],stage.BASE+"admin")
+
+    def test_reject_cross_origin_and_wrong_path(self):
+        for target in ("https://example.com/admin/","http://app9239734904.tgcloud.ai/admin/","/ops/","/admin/?extra=1","//evil.example/admin/"):
+            with self.subTest(target=target),patch.object(stage,"python_download",side_effect=stage.StaticRedirect(target)),patch.object(stage,"curl_download") as curl:
+                with self.assertRaisesRegex(ValueError,"unexpected static redirect"):
+                    stage.remote_digest("admin/index.html")
+                curl.assert_not_called()
+
+    def test_redirect_loop_is_rejected(self):
+        with patch.object(stage,"python_download",side_effect=stage.StaticRedirect("/admin/?qmr_verify=14")):
+            with self.assertRaisesRegex(ValueError,"redirect loop"):
+                stage.remote_digest("admin/index.html")
+
+    def test_curl_fallback_can_follow_same_safe_redirect(self):
+        with patch.object(stage,"python_download",side_effect=stage.URLError("DNS")),patch.object(stage,"curl_download",side_effect=[stage.StaticRedirect("/admin"),b"admin"]):
+            self.assertEqual(stage.remote_digest("admin/index.html"),stage.digest(b"admin"))
 
     def test_both_transports_unavailable_stops(self):
         with patch.object(stage,"python_download",side_effect=stage.URLError("DNS failure")), patch.object(stage,"curl_download",side_effect=OSError("curl exit 6")), patch.object(stage.time,"sleep"):
