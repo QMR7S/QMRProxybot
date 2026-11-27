@@ -7,7 +7,7 @@ export function makeBroadcastControl(db,send,ownerId,now=Date.now) {
   const get=(sql,args={})=>db.get(sql,args);
   const all=(sql,args={})=>db.all(sql,args);
   const run=(sql,args={})=>db.run(sql,args);
-  const job=id=>get('SELECT id,scope,state,content,created_ms FROM qmr_notify_jobs_v13 WHERE id=:id',{':id':id});
+  const job=id=>get('SELECT id,scope,state,content,created_ms,step_seq FROM qmr_notify_jobs_v13 WHERE id=:id',{':id':id});
   const unlocked=async()=>!!(await get("SELECT id FROM qmr_notify_jobs_v13 WHERE scope='canary' AND state='done' LIMIT 1"));
   async function preference(uid,on) {
     if(!pos(uid)||typeof on!=='boolean')throw Error('INVALID_PREFERENCE');
@@ -34,7 +34,7 @@ export function makeBroadcastControl(db,send,ownerId,now=Date.now) {
       if(!Object.hasOwn(counts,r.state)||!Number.isSafeInteger(r.n)||r.n<0)throw Error('INVALID_JOURNAL');
       counts[r.state]=r.n;
     }
-    return {id:j.id,scope:j.scope,state:j.state,counts,total:Object.values(counts).reduce((a,b)=>a+b,0)};
+    return {id:j.id,scope:j.scope,state:j.state,stepSeq:j.step_seq,counts,total:Object.values(counts).reduce((a,b)=>a+b,0)};
   }
   async function create(uid,messageId,content,scope='optin') {
     owner(uid);
@@ -62,26 +62,28 @@ export function makeBroadcastControl(db,send,ownerId,now=Date.now) {
     await run("UPDATE qmr_notify_jobs_v13 SET state='sending' WHERE id=:id AND state='draft' AND EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 WHERE job_id=:id AND state='pending')",{':id':id});
     return summary(uid,id); // confirmation itself sends nothing
   }
-  async function step(uid,id) {
+  async function step(uid,id,expectedSeq) {
     owner(uid);if(!pos(id))throw Error('INVALID_ID');
     const j=await job(id);if(!j)throw Error('NOT_FOUND');
-    if(j.state!=='sending')return summary(uid,id);
+    if(j.state!=='sending'||!Number.isSafeInteger(expectedSeq)||expectedSeq<0||j.step_seq!==expectedSeq)return summary(uid,id);
     if(j.scope==='optin'&&!await unlocked())throw Error('CANARY_REQUIRED');
     // Recheck opt-in and block status at the time of claim, not just snapshot.
     await run("UPDATE qmr_notify_delivery_v13 SET state='skipped' WHERE job_id=:id AND state='pending' AND EXISTS(SELECT 1 FROM qmr_notify_jobs_v13 WHERE id=:id AND state='sending' AND scope='optin') AND NOT EXISTS(SELECT 1 FROM qmr_notify_optin_v13 o JOIN qmr_users_v6 u ON u.user_id=o.user_id WHERE o.user_id=qmr_notify_delivery_v13.user_id AND u.blocked=0)",{':id':id});
     // A single atomic statement claims ONE row. An ambiguous attempt blocks
     // this campaign; an in-flight attempt in any campaign blocks other sends.
     // No lease expiry requeues an uncertain send.
-    const claimed=await get("UPDATE qmr_notify_delivery_v13 SET state='attempting',attempted_ms=:t WHERE job_id=:id AND user_id=(SELECT user_id FROM qmr_notify_delivery_v13 WHERE job_id=:id AND state='pending' ORDER BY user_id LIMIT 1) AND state='pending' AND EXISTS(SELECT 1 FROM qmr_notify_jobs_v13 WHERE id=:id AND state='sending') AND NOT EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 d WHERE d.state='attempting' OR (d.job_id=:id AND d.state='unknown')) AND EXISTS(SELECT 1 FROM qmr_notify_jobs_v13 x WHERE x.id=:id AND ((x.scope='canary' AND qmr_notify_delivery_v13.user_id=:owner) OR (x.scope='optin' AND qmr_notify_delivery_v13.user_id!=:owner AND EXISTS(SELECT 1 FROM qmr_notify_optin_v13 o JOIN qmr_users_v6 u ON u.user_id=o.user_id WHERE o.user_id=qmr_notify_delivery_v13.user_id AND u.blocked=0)))) RETURNING user_id",{':id':id,':t':now(),':owner':ownerId});
+    const claimed=await get("UPDATE qmr_notify_delivery_v13 SET state='attempting',attempted_ms=:t WHERE job_id=:id AND user_id=(SELECT user_id FROM qmr_notify_delivery_v13 WHERE job_id=:id AND state='pending' ORDER BY user_id LIMIT 1) AND state='pending' AND EXISTS(SELECT 1 FROM qmr_notify_jobs_v13 WHERE id=:id AND state='sending' AND step_seq=:seq) AND NOT EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 d WHERE d.state='attempting' OR (d.job_id=:id AND d.state='unknown') OR d.retry_after_ms>:t) AND EXISTS(SELECT 1 FROM qmr_notify_jobs_v13 x WHERE x.id=:id AND ((x.scope='canary' AND qmr_notify_delivery_v13.user_id=:owner) OR (x.scope='optin' AND qmr_notify_delivery_v13.user_id!=:owner AND EXISTS(SELECT 1 FROM qmr_notify_optin_v13 o JOIN qmr_users_v6 u ON u.user_id=o.user_id WHERE o.user_id=qmr_notify_delivery_v13.user_id AND u.blocked=0)))) RETURNING user_id",{':id':id,':t':now(),':owner':ownerId,':seq':expectedSeq});
     if(claimed){
       if(!pos(claimed.user_id))throw Error('INVALID_RECIPIENT');
-      let state='unknown';
+      const consumed=await get("UPDATE qmr_notify_jobs_v13 SET step_seq=step_seq+1 WHERE id=:id AND state='sending' AND step_seq=:seq RETURNING id",{':id':id,':seq':expectedSeq});
+      if(consumed?.id!==id)throw Error('DELIVERY_UNCERTAIN');
+      let state='unknown',retryAfter=null;
       try{
         const result=await send(claimed.user_id,j.content);
         if(!pos(result?.message_id)||Number(result?.chat?.id)!==claimed.user_id)throw Error('AMBIGUOUS_SEND');
         state='sent';
-      }catch(_){/* Do not retry an uncertain Telegram result. */}
-      const settled=await get("UPDATE qmr_notify_delivery_v13 SET state=:state,resolved_ms=:t WHERE job_id=:id AND user_id=:uid AND state='attempting' RETURNING user_id",{':id':id,':uid':claimed.user_id,':state':state,':t':now()});
+      }catch(e){if(e?.code===429||e?.error_code===429){const s=e?.parameters?.retry_after;retryAfter=now()+1000*(Number.isSafeInteger(s)&&s>0?Math.min(s,86400):86400);} /* Never retry this recipient. */}
+      const settled=await get("UPDATE qmr_notify_delivery_v13 SET state=:state,resolved_ms=:t,retry_after_ms=:retry WHERE job_id=:id AND user_id=:uid AND state='attempting' RETURNING user_id",{':id':id,':uid':claimed.user_id,':state':state,':t':now(),':retry':retryAfter});
       if(settled?.user_id!==claimed.user_id)throw Error('DELIVERY_UNCERTAIN');
     }
     await run("UPDATE qmr_notify_jobs_v13 SET state='done' WHERE id=:id AND state='sending' AND EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 WHERE job_id=:id) AND NOT EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 WHERE job_id=:id AND state IN ('pending','attempting','unknown')) AND (scope!='canary' OR EXISTS(SELECT 1 FROM qmr_notify_delivery_v13 WHERE job_id=:id AND user_id=:owner AND state='sent'))",{':id':id,':owner':ownerId});

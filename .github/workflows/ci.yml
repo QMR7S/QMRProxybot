@@ -58,3 +58,6 @@ jobs:
           node-version: '22'
       - name: Native board real SQLite
         run: node --test tests/cloud_boards_sqlite.test.mjs
+
+      - name: Controlled notification SQL and concurrency
+        run: node --test tests/broadcast_control_sqlite.test.mjs

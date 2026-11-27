@@ -47,6 +47,7 @@ export const qmrNotifyJobs = table('qmr_notify_jobs_v13', {
  content: text('content').notNull(),
  state: text('state').notNull(),
  createdMs: integer('created_ms').notNull(),
+ stepSeq: integer('step_seq').notNull().default(0),
 });
 export const qmrNotifyDelivery = table('qmr_notify_delivery_v13', {
  id: integer('id').primaryKey({autoIncrement:true}),
@@ -55,6 +56,7 @@ export const qmrNotifyDelivery = table('qmr_notify_delivery_v13', {
  state: text('state').notNull(),
  attemptedMs: integer('attempted_ms'),
  resolvedMs: integer('resolved_ms'),
+ retryAfterMs: integer('retry_after_ms'),
 }, t=>({
  recipient: uniqueIndex('qmr_notify_recipient_v13').on(t.jobId,t.userId),
  status: index('qmr_notify_state_v13').on(t.state,t.jobId),

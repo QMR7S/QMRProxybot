@@ -8,7 +8,7 @@ export function notificationScreen(d,preview=''){
  const {pending,attempting,sent,unknown,skipped}=d.counts;
  const rows=[];
  if(d.state==='draft')rows.push([{text:'تأكيد المسودة (دون إرسال)',callback_data:'q:a:n13:confirm:'+d.id}]);
- if(d.state==='sending'&&pending>0&&!attempting&&!unknown)rows.push([{text:'إرسال للمستلم التالي',callback_data:'q:a:n13:step:'+d.id}]);
+ if(d.state==='sending'&&pending>0&&!attempting&&!unknown)rows.push([{text:'إرسال للمستلم التالي',callback_data:'q:a:n13:step:'+d.id+':'+d.stepSeq}]);
  if(['draft','sending','preparing'].includes(d.state))rows.push([{text:'إلغاء',callback_data:'q:a:n13:cancel:'+d.id}]);
  rows.push([{text:'تحديث الحالة',callback_data:'q:a:n13:status:'+d.id}],[{text:'لوحة المالك',callback_data:'q:admin'}]);
  return {text:'📣 حملة #'+d.id+' · '+(d.scope==='canary'?'اختبار المالك فقط':'اشتراك اختياري')+'\nالحالة: '+(states[d.state]||d.state)+'\nالمستلمون: '+d.total+'\nبانتظار: '+pending+' | مؤكد: '+sent+'\nقيد المحاولة: '+attempting+' | غير محسوم: '+unknown+' | مستبعد: '+skipped+(preview?'\n\nمعاينة:\n'+preview:'')+(attempting||unknown?'\n\nتوقف الإرسال؛ لا تعد المحاولة غير المحسومة. استخدم أمر الإلغاء أو المصالحة من دليل الإشعارات.':''),reply_markup:{inline_keyboard:rows}};
