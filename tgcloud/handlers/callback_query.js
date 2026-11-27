@@ -1,10 +1,10 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
 import {api} from 'sdk';
-import {ownerCallbackAllowed} from '../lib/owner_callback_guard.js';
-import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from '../lib/store.js';
+import {ownerCallbackAllowed} from 'lib/owner_callback_guard';
+import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from 'lib/store';
 import {IS_OWNER,text,home,checkSubscription,subscriptionScreen,
   sendScreen,genericScreen,serversScreen,statusScreen,adminScreen,
-  broadcastIntro,keyboard} from '../lib/ui.js';
+  broadcastIntro,keyboard} from 'lib/ui';
 
 const ownerOnly = data => data==='q:admin'||data.startsWith('q:a:');
 async function ack(query,msg) {

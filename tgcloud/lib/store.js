@@ -1,7 +1,7 @@
 // Minimal privacy-preserving database access. No message bodies or usernames tracked.
 import { db } from 'sdk';
 import { eq, gt, asc, sql } from 'sdk/db';
-import { qmrUsers, qmrSettings, qmrBroadcasts } from '../schema.js';
+import { qmrUsers, qmrSettings, qmrBroadcasts } from 'schema';
 
 const unix = () => Math.floor(Date.now()/1000);
 

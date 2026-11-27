@@ -1,18 +1,19 @@
 // Shared QMR Proxy Telegram interface. Default inline buttons use Telegram's
 // theme-native transparent style; only the primary action uses primary color.
 import { api, fetch as sdkFetch } from 'sdk';
-import { getNodes } from './nodes.js';
-import { getSetting, getStats } from './store.js';
+import { getNodes } from 'lib/nodes';
+import { getSetting, getStats } from 'lib/store';
 
 export const OWNER_ID = 6246913670;
 export const CHANNEL = '@QMR7S';
 export const CHANNEL_URL = 'https://t.me/QMR7S';
 export const SUPPORT_URL = 'https://t.me/QMRSupportbot';
 export const SITE_URL = 'https://qmr-proxy.alialnyamy675.chatgpt.site';
+export const MINI_APP_URL = 'https://app9239734904.tgcloud.ai/mini/';
 export const IS_OWNER = id => Number(id) === OWNER_ID;
 const btn = (text, data, style) => ({text,callback_data:data,...(style?{style}:{})});
 const url = (text, link) => ({text,url:link});
-const appButton = (label = '✨ فتح تطبيق QMR Proxy') => ({text:label,web_app:{url:SITE_URL},style:'primary'});
+const appButton = (label = '✨ فتح تطبيق QMR Proxy') => ({text:label,web_app:{url:MINI_APP_URL},style:'primary'});
 export const keyboard = rows => ({inline_keyboard:rows});
 
 export const text = {
@@ -68,7 +69,8 @@ export async function serversScreen(page=1) {
   const result=await getNodes(sdkFetch);
   const all=Array.isArray(result.nodes)?result.nodes:[];
   const max=Math.max(1,Math.ceil(all.length/10));
-  const p=Math.min(max,Math.max(1,Number(page)||1));
+  const requested = Number(page);
+  const p = Math.min(max, Math.max(1, Number.isFinite(requested) ? Math.trunc(requested) : 1));
   const listed=all.slice((p-1)*10,p*10);
   if (!listed.length) return {text:'لا توجد روابط مدرجة الآن. راجع الموقع أو حاول لاحقاً.',reply_markup:backKeyboard()};
   const lines=listed.map((n,i)=>{
@@ -119,7 +121,7 @@ export async function adminScreen() {
   };
 }
 export function broadcastIntro() {
-  return {text:'📢 إرسال تنبيه إداري\n\nأرسل في المحادثة الخاصة فقط:\n/broadcast نص الرسالة\n\nسأعرض معاينة وأطلب تأكيداً قبل الإرسال. التنفيذ يكون بحد أقصى 15 مستخدماً لكل دفعة لتجنب الضغط وحدود Telegram. يمكن إيقاف المسودة.\n\nتنبيه: الإرسال العام مسؤولية المالك، ويجب عدم إرسال رسائل غير مرغوبة.',reply_markup:backKeyboard()};
+  return {text:'⛔ الإشعارات الجماعية متوقفة مؤقتًا حتى اكتمال ترحيل v13 واختبار سلامة الإرسال.',reply_markup:backKeyboard()};
 }
 export async function sendScreen(chatId,screen,editMessageId=null) {
   const params={chat_id:chatId,...screen,link_preview_options:{is_disabled:true}};

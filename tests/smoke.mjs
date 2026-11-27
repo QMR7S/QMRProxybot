@@ -8,6 +8,23 @@ const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..');
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'qmr-v6-smoke-'));
 try {
   fs.cpSync(path.join(root,'tgcloud'),path.join(tmp,'tgcloud'),{recursive:true});
+  // Production uses Telegram's canonical module IDs. Translate ONLY in the Node mock.
+  function adapt(dir) {
+    for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
+      const file=path.join(dir,entry.name);
+      if(entry.isDirectory()) { adapt(file); continue; }
+      if(!entry.name.endsWith('.js')) continue;
+      const code=fs.readFileSync(file,'utf8');
+      const adapted=code.replace(/from\s+(['"])(schema|lib\/[\w/-]+)\1/g,
+        (_,quote,id)=>{
+          let target=path.relative(path.dirname(file),path.join(tmp,'tgcloud',id+'.js')).split(path.sep).join('/');
+          if(!target.startsWith('.')) target='./'+target;
+          return 'from '+quote+target+quote;
+        });
+      fs.writeFileSync(file,adapted);
+    }
+  }
+  adapt(path.join(tmp,'tgcloud'));
   fs.mkdirSync(path.join(tmp,'node_modules','sdk'),{recursive:true});
   fs.writeFileSync(path.join(tmp,'package.json'),JSON.stringify({type:'module'}));
   fs.writeFileSync(path.join(tmp,'node_modules','sdk','package.json'),JSON.stringify({name:'sdk',type:'module',exports:{'.':'./index.js','./db':'./db.js'}}));
@@ -38,7 +55,7 @@ try {
   const cb=(await import(pathToFileURL(path.join(tmp,'tgcloud/handlers/callback_query.js')).href)).default;
   const {getNodes,selectLiveNodes}=await import(pathToFileURL(path.join(tmp,'tgcloud/lib/nodes.js')).href);
   const fakeUser=(id,txt)=>({chat:{id,type:'private'},from:{id},text:txt});
-  const fakeCb=(id,data)=>({id:'callback1',data,from:{id},message:{chat:{id},message_id:321}});
+  const fakeCb=(id,data)=>({id:'callback1',data,from:{id},message:{chat:{id,type:'private'},message_id:321}});
   const reset=()=>{globalThis.qmrTest.messages=[];globalThis.qmrTest.edits=[];globalThis.qmrTest.answers=[];};
 
   await m(fakeUser(10001,'/start'));
@@ -98,7 +115,10 @@ try {
   globalThis.qmrTest.editError=null;
   assert.equal(defaultBtn.inline_keyboard[2][0].style,undefined);
   const appRow=defaultBtn.inline_keyboard.find(row=>row.some(button=>button.web_app));
-  assert.equal(appRow?.[0]?.web_app?.url,'https://qmr-proxy.alialnyamy675.chatgpt.site');
+  assert.equal(appRow?.[0]?.web_app?.url,'https://app9239734904.tgcloud.ai/mini/');
+  const {serversScreen}=await import(pathToFileURL(path.join(tmp,'tgcloud/lib/ui.js')).href);
+  assert.match((await serversScreen(2.9)).text,/11\. /);
+  assert.match((await serversScreen(Infinity)).text,/01\. /);
   reset();
   await m(fakeUser(10001,'/app'));
   assert.ok(globalThis.qmrTest.messages.at(-1)?.reply_markup?.inline_keyboard?.some(row=>row.some(x=>x.web_app?.url)));
