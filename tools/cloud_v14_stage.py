@@ -7,6 +7,11 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import subprocess
+import tempfile
+import time
+import sys
+from urllib.error import URLError, HTTPError
 import urllib.request
 from urllib.parse import quote
 
@@ -36,19 +41,56 @@ def verified(backup):
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,*a,**kw):return None
 
-def remote_digest(p):
+def python_download(url):
     op=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
-    req=urllib.request.Request(BASE+quote(p,safe="/")+"?qmr_verify=14",headers={"Cache-Control":"no-cache"})
-    with op.open(req,timeout=20) as r:
-        if r.status!=200:raise ValueError("HTTP mismatch: "+p)
-        data=r.read(MAX+1)
-        if not data or len(data)>MAX:raise ValueError("size mismatch: "+p)
-        return digest(data)
+    req=urllib.request.Request(url,headers={"Cache-Control":"no-cache"})
+    with op.open(req,timeout=15) as r:
+        if r.status!=200:raise ValueError("unexpected HTTP status")
+        return r.read(MAX+1)
+
+def curl_download(url):
+    # No redirect following, no TLS bypass, no inherited curl config or proxy.
+    # The body goes to a private temporary file, not to the terminal.
+    with tempfile.TemporaryDirectory(prefix="qmr-https-") as tmp:
+        target=Path(tmp)/"body"
+        r=subprocess.run(["curl","-q","--silent","--show-error","--noproxy","*",
+            "--proto","=https","--connect-timeout","10","--max-time","25",
+            "--max-filesize",str(MAX),"--header","Cache-Control: no-cache",
+            "--output",str(target),"--write-out","%{http_code}",url],
+            capture_output=True,text=True,timeout=30)
+        if r.returncode!=0:raise OSError("curl exit "+str(r.returncode))
+        if r.stdout.strip()!="200":raise ValueError("unexpected HTTP status")
+        if not target.is_file() or target.stat().st_size>MAX:raise ValueError("invalid body size")
+        return target.read_bytes()
+
+def remote_digest(p):
+    url=BASE+quote(p,safe="/")+"?qmr_verify=14"
+    failures=[]
+    for attempt in range(2):
+        for download in (python_download,curl_download):
+            try:
+                data=download(url)
+                if not data or len(data)>MAX:raise ValueError("invalid body size")
+                return digest(data)
+            except HTTPError as e:
+                if e.code not in (408,429,500,502,503,504):raise ValueError("HTTP "+str(e.code)+": "+p) from None
+                failures.append("HTTP "+str(e.code))
+            except (OSError,URLError,subprocess.SubprocessError) as e:
+                failures.append(type(e).__name__+": "+str(e)[:120])
+        if attempt==0:time.sleep(2)
+    raise RuntimeError("HTTPS verification unavailable for "+p+"; "+ "; ".join(failures)+
+        ". Check Android network/DNS and retry. No deployment authorized.") from None
 
 def check_remote(hashes):
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-        for p,actual in zip(hashes,pool.map(remote_digest,hashes)):
-            if actual!=hashes[p]:raise ValueError("live static file changed: "+p)
+    # Verify a single representative file before starting concurrent requests.
+    items=list(hashes.items())
+    if not items:raise ValueError("empty manifest")
+    p,expected=items[0]
+    if remote_digest(p)!=expected:raise ValueError("live static file changed: "+p)
+    print("LIVE HTTPS PREFLIGHT PASS",flush=True)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        for (p,expected),actual in zip(items[1:],pool.map(remote_digest,[p for p,_ in items[1:]])):
+            if actual!=expected:raise ValueError("live static file changed: "+p)
     print("LIVE STATIC HASHES MATCH:",len(hashes))
 
 def replace_once(s,old,new,name):
@@ -140,7 +182,11 @@ if __name__=="__main__":
     p.add_argument("backup",type=Path);p.add_argument("target",type=Path)
     p.add_argument("--verify-release",action="store_true")
     a=p.parse_args()
-    if a.verify_release:
-        manifest=json.loads((a.target.parent/"static-release-manifest.json").read_text())
-        check_remote(manifest)
-    else:stage(a.backup,a.target)
+    try:
+        if a.verify_release:
+            manifest=json.loads((a.target.parent/"static-release-manifest.json").read_text())
+            check_remote(manifest)
+        else:stage(a.backup,a.target)
+    except (ValueError,RuntimeError,OSError) as exc:
+        print("STOP:",str(exc),file=sys.stderr)
+        sys.exit(1)

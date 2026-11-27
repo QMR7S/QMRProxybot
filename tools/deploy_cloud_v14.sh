@@ -41,12 +41,12 @@ if npx --no-install tgcloud run endpoints/qmr_admin '{op:"summary"}' --ctx "$BAD
 fi
 grep -Eq 'OWNER_ONLY|حساب المالك' "$R/denied.private.log" || { echo "STOP: denial not verified"; exit 1; }
 echo "SDK AND OWNER GATE: PASS"
-echo "=== ADDITIVE SCHEMA ONLY ==="
-npx --no-install tgcloud push schema
-npx --no-install tgcloud migrate --dry-run
+echo "=== ADDITIVE SCHEMA ONLY (LOCAL PREVIEW; NO CLOUD WRITE YET) ==="
+npx --no-install tgcloud migrate --local --dry-run
 echo "Only the new qmr_board_audit_v14 table may be added. If anything else appears, stop."
 read -r -p "Type ADD_AUDIT_TABLE to continue: " ANSWER
 [[ "$ANSWER" == "ADD_AUDIT_TABLE" ]] || exit 1
+npx --no-install tgcloud push schema
 npx --no-install tgcloud migrate --safe
 npx --no-install tgcloud migrate --dry-run | tee "$R/migration-final.log"
 grep -q "No schema changes" "$R/migration-final.log"

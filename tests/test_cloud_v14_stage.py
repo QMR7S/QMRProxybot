@@ -41,6 +41,22 @@ class CloudStage(unittest.TestCase):
             for f in release.rglob("*.js"):
                 subprocess.run(["node","--check",str(f)],check=True,capture_output=True)
 
+    def test_dns_failure_uses_verified_https_fallback(self):
+        with patch.object(stage,"python_download",side_effect=stage.URLError("DNS failure")), patch.object(stage,"curl_download",return_value=b"actual remote content") as curl:
+            self.assertEqual(stage.remote_digest("index.html"),stage.digest(b"actual remote content"))
+            curl.assert_called_once_with(stage.BASE+"index.html?qmr_verify=14")
+
+    def test_both_transports_unavailable_stops(self):
+        with patch.object(stage,"python_download",side_effect=stage.URLError("DNS failure")), patch.object(stage,"curl_download",side_effect=OSError("curl exit 6")), patch.object(stage.time,"sleep"):
+            with self.assertRaisesRegex(RuntimeError,"No deployment authorized"):
+                stage.remote_digest("index.html")
+
+    def test_no_fallback_on_invalid_body(self):
+        with patch.object(stage,"python_download",return_value=b""), patch.object(stage,"curl_download") as curl:
+            with self.assertRaisesRegex(ValueError,"invalid body size"):
+                stage.remote_digest("index.html")
+            curl.assert_not_called()
+
     def test_modified_backup_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);backup,_=self.make_backup(root)
