@@ -1,6 +1,6 @@
 // Additive QMR Proxy v6 tables. Deploy schema and review `tgcloud migrate --dry-run`
 // before applying; never drop or rewrite unrelated tables.
-import { table, integer, text, index } from 'sdk/db';
+import { table, integer, text, index, uniqueIndex } from 'sdk/db';
 
 export const qmrUsers = table('qmr_users_v6', {
   userId: integer('user_id').primaryKey(),
@@ -34,3 +34,28 @@ export const qmrBoardAudit = table('qmr_board_audit_v14', {
   createdAt: integer('created_at').notNull(),
   state: text('state').notNull().default('pending'),
 });
+
+// Controlled V13 notifications: additive and separate from legacy broadcasts.
+export const qmrNotifyOptin = table('qmr_notify_optin_v13', {
+ userId: integer('user_id').primaryKey(),
+ enabledAt: integer('enabled_at').notNull(),
+});
+export const qmrNotifyJobs = table('qmr_notify_jobs_v13', {
+ id: integer('id').primaryKey({autoIncrement:true}),
+ messageId: integer('message_id').notNull().unique(),
+ scope: text('scope').notNull(),
+ content: text('content').notNull(),
+ state: text('state').notNull(),
+ createdMs: integer('created_ms').notNull(),
+});
+export const qmrNotifyDelivery = table('qmr_notify_delivery_v13', {
+ id: integer('id').primaryKey({autoIncrement:true}),
+ jobId: integer('job_id').notNull(),
+ userId: integer('user_id').notNull(),
+ state: text('state').notNull(),
+ attemptedMs: integer('attempted_ms'),
+ resolvedMs: integer('resolved_ms'),
+}, t=>({
+ recipient: uniqueIndex('qmr_notify_recipient_v13').on(t.jobId,t.userId),
+ status: index('qmr_notify_state_v13').on(t.state,t.jobId),
+}));

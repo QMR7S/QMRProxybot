@@ -46,7 +46,7 @@ try {
     const col=()=>({primaryKey(){return this},notNull(){return this},default(){return this},unique(){return this}});
     export const table=(name,columns,fn)=>({name,...columns});
     export const integer=col; export const text=col;
-    export const index=()=>({on(){return {}}});
+    export const index=()=>({on(){return {}}}); export const uniqueIndex=index;
     export const sql=(s,...xs)=>'';
     export const eq=()=>({});export const gt=()=>({});export const asc=()=>({});
   `);

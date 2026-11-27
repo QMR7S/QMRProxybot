@@ -1,5 +1,6 @@
 // Telegram Serverless inline callbacks; every privileged action rechecks owner ID.
 import {api,fetch as sdkFetch} from 'sdk';
+import {notifications,notificationHelp,notificationScreen,notificationError} from 'lib/notification_runtime';
 import {getExtraNodes,extraPage,qualityUnavailable} from 'lib/extra_cloud';
 import {ownerCallbackAllowed} from 'lib/owner_callback_guard';
 import {isBlocked,getSetting,setSetting,getStats,broadcastById,cancelBroadcast} from 'lib/store';
@@ -78,7 +79,14 @@ export default async function(query) {
   }
   if (data==='q:a:source') return sendScreen(chatId,await statusScreen(),messageId);
   if (data==='q:a:channel') return sendScreen(chatId,{text:'📣 الاشتراك الإجباري\n\nالقناة: @QMR7S\nتحقق الأعضاء: Telegram getChatMember\n\nيجب أن يكون @QMRProxybot مشرفاً في القناة لكي يكون فحص العضوية موثوقاً.\n\nمالك البوت مستثنى من شرط الاشتراك لإدارة الطوارئ.',reply_markup:keyboard([[{text:'⚙️ لوحة المالك',callback_data:'q:admin'}]])},messageId);
-  if (data==='q:a:broadcast') return sendScreen(chatId,broadcastIntro(),messageId);
+  if (data==='q:a:broadcast') return sendScreen(chatId,notificationHelp,messageId);
+  if(data.startsWith('q:a:n13:')){
+    const match=/^q:a:n13:(confirm|step|cancel|status):([1-9][0-9]*)$/.exec(data);
+    if(!match)return;
+    const id=Number(match[2]);if(!Number.isSafeInteger(id))return;
+    try{const action=match[1]==='status'?'summary':match[1];return sendScreen(chatId,notificationScreen(await notifications[action](uid,id)),messageId);}
+    catch(e){return sendScreen(chatId,notificationError(e),messageId);}
+  }
   if (data==='q:a:maintenance') {
     let next='1';
     try {next=(await getSetting('maintenance','0'))==='1'?'0':'1';}

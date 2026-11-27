@@ -1,5 +1,6 @@
 // Telegram Serverless — QMR Proxy v6. Does not change webhooks itself.
 import {api,fetch as sdkFetch} from 'sdk';
+import {notifications,notificationHelp,notificationScreen,notificationError} from 'lib/notification_runtime';
 import {getExtraNodes,extraPage,qualityUnavailable} from 'lib/extra_cloud';
 import {trackUser,isBlocked,setBlocked,getSetting,setSetting,forgetUser} from 'lib/store';
 import {IS_OWNER,text,home,subscriptionScreen,checkSubscription,sendScreen,
@@ -14,10 +15,20 @@ function commandAndArg(input) {
 export default async function(message) {
   const uid=Number(message?.from?.id);
   const chatId=message?.chat?.id;
-  if (!Number.isSafeInteger(uid)||!chatId||message?.chat?.type!=='private') return;
+  if (!Number.isSafeInteger(uid)||uid<=0||Number(chatId)!==uid||message?.chat?.type!=='private') return;
   const {command,arg}=commandAndArg(message.text);
   if (!command.startsWith('/')) return;
   const owner=IS_OWNER(uid);
+  // Privacy requests must be available even when a user is blocked.
+  if(command==='/delete_my_data'){
+    if(owner)return sendScreen(chatId,{text:'حذف سجل المالك غير متاح عبر الأمر العام.'});
+    try{await notifications.forget(uid);await forgetUser(uid);return sendScreen(chatId,{text:'✅ حُذف سجل استخدامك واشتراك الإشعارات وسجلات التسليم المحسومة. سيُنشأ سجل استخدام جديد إذا استخدمت البوت لاحقًا.'});}
+    catch(e){return sendScreen(chatId,notificationError(e));}
+  }
+  if(command==='/notifications'&&arg==='off'){
+    try{await notifications.preference(uid,false);return sendScreen(chatId,{text:'✅ أوقفت الإشعارات المستقبلية. قد تكون رسالة بدأ إرسالها بالفعل في الطريق.'});}
+    catch(e){return sendScreen(chatId,notificationError(e));}
+  }
   try {await trackUser(uid);} catch (_) { /* DB schema may not yet be migrated */ }
   if (!owner) {
     try { if (await isBlocked(uid)) {
@@ -32,10 +43,12 @@ export default async function(message) {
   if (['/help','/terms','/privacy','/support','/steps','/about','/channel','/app','/faq','/safety'].includes(command)) {
     return sendScreen(chatId,genericScreen(command.slice(1),owner));
   }
-  if (command==='/delete_my_data') {
-    if(owner) return sendScreen(chatId,{text:'حذف سجل المالك معطّل لحماية إحصاءات وإعدادات الإدارة. البيانات محفوظة فقط بعد تفعيل قاعدة البيانات.'});
-    try {await forgetUser(uid);return sendScreen(chatId,{text:'✅ تم حذف سجل حسابك من قاعدة بيانات QMR Proxy. سيُنشأ سجل جديد إذا استخدمت البوت مجدداً.'});}
-    catch (_){return sendScreen(chatId,{text:'⚠️ قاعدة البيانات غير مفعلة أو تعذر الحذف. تواصل مع @QMRSupportbot.'});}
+  if(command==='/notifications'){
+    if(arg!=='on')return sendScreen(chatId,{text:'إشعارات اختيارية: /notifications on للتفعيل أو /notifications off للإلغاء.'});
+    const check=await checkSubscription(uid);
+    if(!check.ok)return sendScreen(chatId,subscriptionScreen(check));
+    try{await notifications.preference(uid,true);return sendScreen(chatId,{text:'✅ تم تفعيل الإشعارات الاختيارية. يمكنك إيقافها في أي وقت: /notifications off'});}
+    catch(e){return sendScreen(chatId,notificationError(e));}
   }
   if (owner) {
     if (command==='/admin'||command==='/panel'||command==='/stats') return sendScreen(chatId,await adminScreen());
@@ -53,10 +66,17 @@ export default async function(message) {
       try{await setBlocked(target,command==='/ban');return sendScreen(chatId,{text:'✅ '+(command==='/ban'?'حظر':'رفع حظر')+' المستخدم '+target});}
       catch (_){return sendScreen(chatId,{text:'⚠️ قاعدة البيانات غير مهيأة.'});}
     }
-    if (command==='/broadcast') {
-      // SAFETY HOLD: never create or send legacy drafts while v13 migration
-      // remains unvalidated. Other bot functions are unaffected.
-      return sendScreen(chatId,{text:'⛔ الإشعارات الجماعية متوقفة مؤقتًا لحماية المستلمين. لن تُنشأ مسودة جديدة حتى اكتمال ترحيل v13 واختبار قاعدة البيانات.'});
+    if(['/broadcast','/broadcast_test','/broadcast_status','/broadcast_abandon'].includes(command)){
+      try{
+        if(command==='/broadcast'||command==='/broadcast_test'){
+          if(!arg)return sendScreen(chatId,notificationHelp);
+          return sendScreen(chatId,notificationScreen(await notifications.create(uid,message.message_id,arg,command==='/broadcast_test'?'canary':'optin'),arg));
+        }
+        if(command==='/broadcast_status'&&/^[1-9][0-9]*$/.test(arg))return sendScreen(chatId,notificationScreen(await notifications.summary(uid,Number(arg))));
+        const match=/^([1-9][0-9]*) CONFIRM$/.exec(arg);
+        if(command==='/broadcast_abandon'&&match)return sendScreen(chatId,notificationScreen(await notifications.abandon(uid,Number(match[1]))));
+        return sendScreen(chatId,notificationHelp);
+      }catch(e){return sendScreen(chatId,notificationError(e));}
     }
   }
   if (['/extra','/servers_extra','/best','/quality'].includes(command)) {
