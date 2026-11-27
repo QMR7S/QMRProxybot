@@ -5,6 +5,9 @@ import {createBoards} from 'lib/cloud_boards_core';
 const boards=createBoards({db,api,getNodes:()=>getNodes(sdkFetch),getSetting,setSetting,setBlocked});
 const labels={
  OWNER_ONLY:'هذه اللوحة لحساب المالك فقط.',
+ AUTH_DATE_MISSING:'AUTH_DATE_MISSING — لم توفر المنصة تاريخ الجلسة الموقّعة.',
+ AUTH_DATE_FORMAT:'AUTH_DATE_FORMAT — صيغة تاريخ الجلسة غير معروفة.',
+ AUTH_DATE_FUTURE:'AUTH_DATE_FUTURE — تاريخ الجلسة في المستقبل.',
  REOPEN_TELEGRAM:'أعد فتح اللوحة من Telegram لتجديد المصادقة.',
  CONFIRM_REQUIRED:'يلزم تأكيد الإجراء.',
  INVALID_ACTION:'الإجراء غير صالح.',

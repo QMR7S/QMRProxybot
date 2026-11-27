@@ -3,10 +3,17 @@ export const OWNER_ID=6246913670;
 export function authorizeOwner(ctx,now=Date.now()) {
   const d=ctx?.initData;
   const uid=d?.user?.id;
-  const auth=d?.auth_date;
   if (!Number.isSafeInteger(uid)||uid!==OWNER_ID) throw Error('OWNER_ONLY');
-  if (!Number.isSafeInteger(auth)||auth>Math.floor(now/1000)+60||Math.floor(now/1000)-auth>3600)
-    throw Error('REOPEN_TELEGRAM');
+  // Telegram may serialize an auth_date query field as a decimal string.
+  // Read ONLY the server-verified context. Never accept a client input value.
+  const raw=d?.auth_date;
+  if(raw===undefined||raw===null)throw Error('AUTH_DATE_MISSING');
+  const auth=typeof raw==='string'&&/^[1-9][0-9]{0,10}$/.test(raw)?Number(raw):raw;
+  if(!Number.isSafeInteger(auth)||auth<=0)throw Error('AUTH_DATE_FORMAT');
+  const current=Math.floor(now/1000);
+  if(!Number.isSafeInteger(current))throw Error('AUTH_DATE_FORMAT');
+  if(auth>current+60)throw Error('AUTH_DATE_FUTURE');
+  if(current-auth>3600)throw Error('REOPEN_TELEGRAM');
   return uid;
 }
 export function parseAction(input) {

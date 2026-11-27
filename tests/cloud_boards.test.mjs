@@ -47,3 +47,21 @@ test('admin summary returns current DB fields',async()=>{
  const {boards}=fixture();const d=await boards.admin({op:'summary'},ctx);
  assert.deepEqual(d.users,[]);assert.deepEqual(d.events,[]);assert.equal(d.maintenance,false);
 });
+
+test('verified numeric-string auth_date works with unchanged one-hour freshness limit',()=>{
+ const make=auth_date=>({initData:{user:{id:OWNER_ID},auth_date}});
+ assert.equal(authorizeOwner(make('1700000000'),now()),OWNER_ID);
+ assert.equal(authorizeOwner(make('1699996400'),now()),OWNER_ID);
+ assert.throws(()=>authorizeOwner(make('1699996399'),now()),/REOPEN_TELEGRAM/);
+ assert.throws(()=>authorizeOwner(make('1700000061'),now()),/AUTH_DATE_FUTURE/);
+ for(const bad of ['', ' 1700000000', '1.7e9', '1700000000.0', '1700000000000', true, {}, -1, 0])
+   assert.throws(()=>authorizeOwner(make(bad),now()),/AUTH_DATE_FORMAT/);
+ assert.throws(()=>authorizeOwner(make(undefined),now()),/AUTH_DATE_MISSING/);
+ assert.throws(()=>authorizeOwner({initData:{user:{id:1},auth_date:'1700000000'}},now()),/OWNER_ONLY/);
+});
+test('client cannot repair missing or stale signed date by sending input',async()=>{
+ const {boards,calls}=fixture();
+ await assert.rejects(boards.admin({op:'summary',auth_date:1700000000},{initData:{user:{id:OWNER_ID}}}),/AUTH_DATE_MISSING/);
+ await assert.rejects(boards.admin({op:'action',action:'maintenance',enabled:true,confirm:'CONFIRM',auth_date:1700000000},{initData:{user:{id:OWNER_ID},auth_date:'1699996399'}}),/REOPEN_TELEGRAM/);
+ assert.equal(calls.length,0);
+});
